@@ -1,0 +1,27 @@
+{
+    "name": "rwbuild/guhemba",
+    "description": "A laravel-php package that facilitates the integration of guhemba payment in your application",
+    "authors": [
+        {
+            "name": "Promesse kayenga",
+            "email": "promskakaprodo45@gmail.com"
+        }
+    ],
+    "license": "MIT",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "RWBuild\\Guhemba\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "RWBuild\\Guhemba\\GuhembaServiceProvider"
+            ],
+            "aliases": {
+                "Guhemba": "RWBuild\\Guhemba\\Facades\\Guhemba"
+            }
+        }
+    }
+}
