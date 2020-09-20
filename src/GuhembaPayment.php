@@ -31,6 +31,8 @@ class GuhembaPayment
 
     /**
      * Get all config guhemba keys or get a single value of a passed key
+     * 
+     * @return string|array
      */
     public static function getKeys($keyName = null)
     {
@@ -55,6 +57,8 @@ class GuhembaPayment
 
     /**
      * Add a slash on the base url then concatainate it with endpoint url
+     * 
+     * @return string
      */
     private static function joinUrl($baseUrl, $endpointUrl, $isWeb = false)
     {
@@ -63,6 +67,8 @@ class GuhembaPayment
 
     /**
      * Request for a payment qrcode at guhemba
+     * 
+     * @return object
      */
     public static function generateQrcode($amount)
     {
@@ -72,6 +78,8 @@ class GuhembaPayment
     /**
      * Get the public information about a transaction using its
      * token
+     * 
+     * @return object
      */
     public static function transactionFromToken(string $token)
     {
@@ -82,11 +90,13 @@ class GuhembaPayment
      * Get the public information about a transaction using the
      * code that reference a transaction: this method is used on
      * callback==> when a direct payment is done
+     * 
+     * @return object
      */
     public static function transaction()
     {
         $validateRequest = self::checkSessionState();
-        
+
         if ($validateRequest !== true) {
             return $validateRequest;
         }
@@ -125,8 +135,11 @@ class GuhembaPayment
     /**
      * Redirect user to guhemba when they hit the "pay button" on
      * the web element 
+     * 
+     * @param string $qrcodeSlug: the qrcode identifier
+     * @param string $paymentRef: a code that refer to an order
      */
-    public static function redirect($qrcodeId, $paymentRef)
+    public static function redirect(string $qrcodeSlug, string $paymentRef)
     {
         $keys = self::getKeys();
         $baseUrl = $keys['GUHEMBA_BASE_URL'];
@@ -142,13 +155,14 @@ class GuhembaPayment
             'state' => $state,
         ]);
        
-        return redirect()->away($url . "/{$qrcodeId}?" . $query);
+        return redirect()->away($url . "/{$qrcodeSlug}?" . $query);
     }
 
     /**
      * Send a request to generate a qrcode
      * 
      * @param number $amount
+     * @return object: qrcode info
      */
     private static function sendQrcodeRequest($amount)
     {
@@ -166,6 +180,7 @@ class GuhembaPayment
      * Send a request to fetch a transaction info using a token
      * 
      * @param string $token
+     * @return object: transaction info
      */
     private static function sendTransactionRequest($token)
     {
@@ -183,7 +198,7 @@ class GuhembaPayment
      * Send a request to fetch a transaction info using a reference code
      * of a transaction
      * 
-     * @param string $token
+     * @return object: transaction info
      */
     private static function sendTransactionCodeRequest()
     {
@@ -202,6 +217,7 @@ class GuhembaPayment
      * Build the header and body to be sent with the request 
      * 
      * @param string $value: can be a "token" or "amount" 
+     * @return array
      */
     private static function buildRequestData($value)
     {
@@ -233,17 +249,15 @@ class GuhembaPayment
     {
         try {
             return self::$callableMethod($param);
-        } catch (ClientException $e) {
-            return self::handleError($e);
-        } catch (ConnectException $e) {
-            return self::handleError($e);
-        } catch (Exception $e) {
+        } catch (ClientException | ConnectException | Exception  $e) {
             return self::handleError($e);
         }
     }
 
     /**
      * Handle error fired by guzzle request
+     * 
+     * @return object
      */
     private static function handleError($exception)
     {
@@ -263,6 +277,8 @@ class GuhembaPayment
 
     /**
      * Instantiate the throwable exception class
+     * 
+     * @return object
      */
     private static function fireError($msg, $status = 400, $withData = null)
     {
