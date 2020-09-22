@@ -30,6 +30,11 @@ class GuhembaPayment
     private static $redirectGuhembaUrl = 'rwpay-element/process-qrcode'; 
 
     /**
+     * The response comming from guhemba
+     */
+    public $response = null;
+
+    /**
      * Get all config guhemba keys or get a single value of a passed key
      * 
      * @return string|array
@@ -56,6 +61,56 @@ class GuhembaPayment
     }
 
     /**
+     * Grab the qrcode object received in the response
+     * 
+     * @return object
+     */
+    public function getQrcode()
+    {
+        return optional($this->response)->qrcode;
+    }
+
+    /**
+     * Grab the transaction object received in the response
+     * 
+     * @return object
+     */
+    public function getTransaction()
+    {
+        return optional($this->response)->transaction;
+    }
+
+    /**
+     * Grab the response of the request
+     * 
+     * @return object
+     */
+    public function getResponse()
+    {
+       return  $this->response;
+    }
+
+    /**
+     * Check if the request was successfully done
+     * 
+     * @return boolean
+     */
+    public function isOk()
+    {
+       return  optional($this->response)->success;
+    }
+
+    /**
+     * Grab the response message of the request
+     * 
+     * @return string
+     */
+    public function getMessage()
+    {
+       return  optional($this->response)->message;
+    }
+
+    /**
      * Add a slash on the base url then concatainate it with endpoint url
      * 
      * @return string
@@ -68,22 +123,30 @@ class GuhembaPayment
     /**
      * Request for a payment qrcode at guhemba
      * 
-     * @return object
+     * @return self
      */
     public static function generateQrcode($amount)
     {
-        return self::caller('sendQrcodeRequest', $amount);
+        $pay = new GuhembaPayment();
+
+        $pay->response = self::caller('sendQrcodeRequest', $amount);
+
+        return $pay;
     }
 
     /**
      * Get the public information about a transaction using its
      * token
      * 
-     * @return object
+     * @return self
      */
     public static function transactionFromToken(string $token)
     {
-        return self::caller('sendTransactionRequest', $token);
+        $pay = new GuhembaPayment();
+
+        $pay->response = self::caller('sendTransactionRequest', $token);
+
+        return $pay;
     }
 
     /**
@@ -91,17 +154,23 @@ class GuhembaPayment
      * code that reference a transaction: this method is used on
      * callback==> when a direct payment is done
      * 
-     * @return object
+     * @return self
      */
     public static function transaction()
     {
         $validateRequest = self::checkSessionState();
 
+        $pay = new GuhembaPayment();
+
         if ($validateRequest !== true) {
-            return $validateRequest;
+            $pay->response = $validateRequest;
+
+            return $pay;
         }
 
-        return self::caller('sendTransactionCodeRequest');
+        $pay->response = self::caller('sendTransactionCodeRequest');
+
+        return $pay;
     }
 
     /**

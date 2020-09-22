@@ -15,7 +15,7 @@ class GuhembaServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/config/guhemba.php' => config_path('guhemba.php')
+            __DIR__.'/config/guhemba-webelement.php' => config_path('guhemba-webelement.php')
         ], 'config');
     }
 }

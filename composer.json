@@ -1,5 +1,5 @@
 {
-    "name": "rwbuild/guhemba",
+    "name": "rwbuild/guhemba-web-element",
     "description": "A laravel-php package that facilitates the integration of guhemba payment in your application",
     "authors": [
         {
