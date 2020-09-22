@@ -42,11 +42,11 @@ class GuhembaPayment
     public static function getKeys($keyName = null)
     {
         if (! $keyName) {
-            $keys = config('guhemba.option');
+            $keys = config('guhemba-webelement.option');
            
-            if (! $keys) throw self::fireError('You should publish first the config tag');
+            if (! $keys) throw new GuhembaPayException('You should publish first the config tag');
         } else {
-            $keys = config("guhemba.option.{$keyName}");
+            $keys = config("guhemba-webelement.option.{$keyName}");
         }
 
         return $keys;
