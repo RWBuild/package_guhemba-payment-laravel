@@ -9,8 +9,11 @@ A laravel-php package that facilitates the integration of guhemba payment in you
  composer require rwbuild/guhemba-web-element
 ```
 
-## 3.Publish config file
+## 3. Configuration
 
+### 3.1 Publish config file
+
+This configuration concerns systems that use a single merchant wallet for receiving payment,
 In order to start enjoying the package, you will need to publish the config file that support `Guhemba` 
 
 ```
@@ -19,7 +22,35 @@ In order to start enjoying the package, you will need to publish the config file
 
 After running this command you should see a `guhemba-webelement` file  under the directory `config`, then you will need to provide all information required in that file.
 
-Now at this stage, I really feel that you are ready to go. let's enjoy the beauty of the package now.
+### 3.2 Configuration for close partners
+
+Make sure that you put the bellow code on top of all your requests:
+
+```php
+    \RWBuild\Guhemba\Facades\Guhemba::partnerKeys([
+        'GUHEMBA_PUBLIC_PARTNER_KEY' => 'request-this-on-guhemba',
+        'GUHEMBA_PARTNER_KEY' => 'request-this-on-guhemba',
+        'GUHEMBA_BASE_URL' => 'guhemba-base-url'// Ask guhemba support team
+    ]);
+```
+
+I advice you to put the above code in one of your service providers class in `boot` method,
+Then you should provide the bellow information on each request that you are performing:
+
+```php
+    Guhemba::dynamicMerchant([
+        'GUHEMBA_API_KEY' => 'wallet-merchant-integration-api-key',
+        
+        'GUHEMBA_MERCHANT_KEY' => 'wallet-merchant-key',
+
+        'GUHEMBA_PUBLIC_KEY' => 'wallet-merchant-integration-public-key',
+
+        'GUHEMBA_REDIRECT_URL' => 'your-dynamic-url'
+    ]);
+```
+All these information above, you can find them in guhemba merchant wallet under the integration menu in settings Or you can request for them programatically.
+
+🤪 Now at this stage, I really feel that you are ready to go. let's enjoy the beauty of the package now 😎.
 
 ## 4. Generating a payment Qrcode
 
@@ -55,7 +86,7 @@ Let's say, user decides to complete the payment on guhemba web then he hits the 
         $qrcodeSlug ='91da-5a565f0b173c';
         $paymentRef = 6;
 
-        return Guhemba::redirect($qrcodeId, $paymentRef)
+        return Guhemba::redirect($qrcodeSlug, $paymentRef)
     }
 ```
 
@@ -78,7 +109,7 @@ Now to grab the transaction information that he has performed use this script:
 
 This time An extra field: `reference` will be added on the transaction `object`.
 
-## 8. Other methods that you may need to use
+## 8. Other methods that you  need to use specially for Error handling
 
 ### 8.1 getResponse()
 
