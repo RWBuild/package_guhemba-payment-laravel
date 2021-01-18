@@ -5,10 +5,13 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
+use RWBuild\Guhemba\Traits\TransactionRequest;
 use RWBuild\Guhemba\Exceptions\GuhembaPayException;
 
 class GuhembaPayment
 {
+    use TransactionRequest;
+    
     /**
      * Endpoint for generating a qrcode
      */
@@ -29,27 +32,116 @@ class GuhembaPayment
      */
     private static $redirectGuhembaUrl = 'rwpay-element/process-qrcode'; 
 
+    private static $isPartner = false;
+
+    /**
+     * The param name of the redirect url
+     * 
+     * @var string: for partner integration it will be : dru
+     */
+    private static $redirectFieldName = 'redirect_url';
+
     /**
      * The response comming from guhemba
      */
     public $response = null;
 
+    public static $dynamicKeys = [
+        'GUHEMBA_API_KEY' => null,
+        'GUHEMBA_MERCHANT_KEY' => null,
+        'GUHEMBA_PUBLIC_KEY' => null,
+        'GUHEMBA_BASE_URL' => null,
+        'GUHEMBA-PARTNER_KEY' => null,
+        'GUHEMBA-PUBLIC_PARTNER_KEY' => null,
+        'GUHEMBA_REDIRECT_URL' => null
+    ];
+
+    /**
+     * Set partner keys 
+     */
+    public static function partnerKeys(array $partnerKeys)
+    {
+        static::$dynamicKeys = [
+            'GUHEMBA_PUBLIC_PARTNER_KEY' => $partnerKeys['GUHEMBA_PUBLIC_PARTNER_KEY'],
+            'GUHEMBA_PARTNER_KEY' => $partnerKeys['GUHEMBA_PARTNER_KEY'],
+            'GUHEMBA_BASE_URL' => $partnerKeys['GUHEMBA_BASE_URL'],
+        ];
+
+        return new static;
+    }
+
     /**
      * Get all config guhemba keys or get a single value of a passed key
+     * 
+     * This method will return keys from config file or from dynamic keys
+     * depending on its integration
      * 
      * @return string|array
      */
     public static function getKeys($keyName = null)
     {
         if (! $keyName) {
-            $keys = config('guhemba-webelement.option');
+            $keys = self::$isPartner ? 
+                        self::$dynamicKeys : 
+                        config('guhemba-webelement.option');
            
-            if (! $keys) throw new GuhembaPayException('You should publish first the config tag');
+            if (! $keys && !self::$isPartner) throw new GuhembaPayException(
+                'You should publish first the config tag'
+            );
+
         } else {
-            $keys = config("guhemba-webelement.option.{$keyName}");
+            $keys = self::$isPartner ? 
+                        self::$dynamicKeys[$keyName] :
+                        config("guhemba-webelement.option.{$keyName}");
         }
 
         return $keys;
+    }
+
+    /**
+     * This is applied to partener who manage multiple merchant wallet 
+     * in his system
+     * 
+     * The provided array of keys should contain:
+     * 
+     * [
+     * 
+     *  'GUHEMBA_API_KEY' => '', // provided in merchant wallet->integration info
+     * 
+     *  'GUHEMBA_MERCHANT_KEY' => '', // the merchant key of a wallet
+     * 
+     *  'GUHEMBA_PUBLIC_KEY' => '', // provided in merchant wallet->integration info
+     * 
+     *  'GUHEMBA_BASE_URL' => '', // Guhemba url
+     * 
+     *  'GUHEMBA-PARTNER-KEY' => '', // it's the partner secret key
+     * 
+     *  'GUHEMBA_PUBLIC_PARTNER_KEY' => '',
+     * 
+     *  'GUHEMBA_REDIRECT_URL' => '' // the redirect url that guhemba will use on complete trans
+     * 
+     * ]
+     * 
+     * @param $dynamicKeys
+     * 
+     * @return self 
+     */
+    public static function dynamicMerchant(array $dynamicKeys)
+    {
+        static::$dynamicKeys = array_merge(static::$dynamicKeys, [
+            'GUHEMBA_API_KEY' => $dynamicKeys['GUHEMBA_API_KEY'],
+            
+            'GUHEMBA_MERCHANT_KEY' => $dynamicKeys['GUHEMBA_MERCHANT_KEY'],
+
+            'GUHEMBA_PUBLIC_KEY' => $dynamicKeys['GUHEMBA_PUBLIC_KEY'],
+
+            'GUHEMBA_REDIRECT_URL' => $dynamicKeys['GUHEMBA_REDIRECT_URL'],
+        ]);
+
+        static::$isPartner = true;
+        static::$redirectFieldName = 'dru';
+
+        return new static;
     }
 
     /**
@@ -219,146 +311,13 @@ class GuhembaPayment
         
         $query = http_build_query([
             'public_key' => $keys['GUHEMBA_PUBLIC_KEY'],
-            'redirect_url' => $keys['GUHEMBA_REDIRECT_URL'],
+            static::$redirectFieldName => $keys['GUHEMBA_REDIRECT_URL'],
             'payment_ref' => $paymentRef,
             'state' => $state,
+            'ppk' => $keys['GUHEMBA_PUBLIC_PARTNER_KEY'] ?? null
         ]);
-       
+    
         return redirect()->away($url . "/{$qrcodeSlug}?" . $query);
     }
-
-    /**
-     * Send a request to generate a qrcode
-     * 
-     * @param number $amount
-     * @return object: qrcode info
-     */
-    private static function sendQrcodeRequest($amount)
-    {
-        $baseUrl = self::getKeys('GUHEMBA_BASE_URL');
-        $url = self::joinUrl($baseUrl, self::$qrcodeUrl);
-     
-        $response =  self::client()->request(
-            'POST', $url, self::buildRequestData($amount)
-        );
-    
-        return json_decode($response->getBody()->getContents()); 
-    }
-
-    /**
-     * Send a request to fetch a transaction info using a token
-     * 
-     * @param string $token
-     * @return object: transaction info
-     */
-    private static function sendTransactionRequest($token)
-    {
-        $baseUrl = self::getKeys('GUHEMBA_BASE_URL');
-        $url = self::joinUrl($baseUrl, self::$transactionUrl);
-    
-        $response =  self::client()->request(
-            'POST', $url, self::buildRequestData($token)
-        );
-    
-        return json_decode($response->getBody()->getContents()); 
-    }
-
-    /**
-     * Send a request to fetch a transaction info using a reference code
-     * of a transaction
-     * 
-     * @return object: transaction info
-     */
-    private static function sendTransactionCodeRequest()
-    {
-        $baseUrl = self::getKeys('GUHEMBA_BASE_URL');
-        $url = self::joinUrl($baseUrl, self::$transCodeUrl);
-        $code = request()->code;
-    
-        $response =  self::client()->request(
-            'POST', $url, self::buildRequestData($code)
-        );
-    
-        return json_decode($response->getBody()->getContents()); 
-    }
-
-    /**
-     * Build the header and body to be sent with the request 
-     * 
-     * @param string $value: can be a "token" or "amount" 
-     * @return array
-     */
-    private static function buildRequestData($value)
-    {
-        $keys = self::getKeys();
-
-        return [
-            'headers' => [
-                'Accept' => 'application/json',
-                'API-KEY' => $keys['GUHEMBA_API_KEY'],
-                'MERCHANT-KEY' => $keys['GUHEMBA_MERCHANT_KEY'],
-                'REDIRECT-URL' => $keys['GUHEMBA_REDIRECT_URL'],
-                'PUBLIC-KEY' => $keys['GUHEMBA_PUBLIC_KEY']
-            ],
-            'form_params' => [
-                // used when user needs to fetch a transaction using a token
-                'token' => $value,
-                // used when user needs to generate a qrcode
-                'amount' => $value,
-                // used when user needs to fetch a transaction using a ref code
-                'code' => $value
-            ]
-        ];
-    }
-
-    /**
-     * A method to call other method and catch their error 
-     */
-    private static function caller($callableMethod, $param = null)
-    {
-        try {
-            return self::$callableMethod($param);
-        } catch (ClientException | ConnectException | Exception  $e) {
-            return self::handleError($e);
-        }
-    }
-
-    /**
-     * Handle error fired by guzzle request
-     * 
-     * @return object
-     */
-    private static function handleError($exception)
-    {
-        $response = $exception->getResponse();
-        
-        if (! $response) return  self::fireError($exception->getMessage());
-       
-        $statusCode = $response->getStatusCode();
-        $errorResp = json_decode($response->getBody());
-       
-        $errorMessage = $errorResp->message ?? $errorResp->error;
-
-        return self::fireError($errorMessage, $statusCode, [
-            'hint' => $exception->getMessage()
-        ]);
-    }
-
-    /**
-     * Instantiate the throwable exception class
-     * 
-     * @return object
-     */
-    private static function fireError($msg, $status = 400, $withData = null)
-    {
-        try {
-            if (! $withData) throw new GuhembaPayException($msg, $status);
-
-            throw ((new GuhembaPayException($msg, $status))->withData($withData));
-        } catch (GuhembaPayException $e) {
-            return $e->getFormatedMessage();
-        }
-    }
-    
     
 }
