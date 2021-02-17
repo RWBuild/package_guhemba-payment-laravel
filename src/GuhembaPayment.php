@@ -57,6 +57,13 @@ class GuhembaPayment
     ];
 
     /**
+     * A payment reference when generating a qrcode
+     * 
+     * @var string
+     */
+    public static $paymentRef = null;
+
+    /**
      * Set partner keys 
      */
     public static function partnerKeys(array $partnerKeys)
@@ -215,13 +222,21 @@ class GuhembaPayment
     /**
      * Request for a payment qrcode at guhemba
      * 
+     * @param double $amount
+     * @param string $paymentRef : the reference of the payment
      * @return self
      */
-    public static function generateQrcode($amount)
+    public static function generateQrcode($amount, $paymentRef = null)
     {
-        $pay = new GuhembaPayment();
+        $pay = new self();
 
-        $pay->response = self::caller('sendQrcodeRequest', $amount);
+        self::$paymentRef = $paymentRef;
+
+        $pay->response = self::caller(
+            'sendQrcodeRequest', 
+            $amount, 
+            $paymentRef
+        );
 
         return $pay;
     }
@@ -234,7 +249,7 @@ class GuhembaPayment
      */
     public static function transactionFromToken(string $token)
     {
-        $pay = new GuhembaPayment();
+        $pay = new self();
 
         $pay->response = self::caller('sendTransactionRequest', $token);
 
@@ -252,7 +267,7 @@ class GuhembaPayment
     {
         $validateRequest = self::checkSessionState();
 
-        $pay = new GuhembaPayment();
+        $pay = new self();
 
         if ($validateRequest !== true) {
             $pay->response = $validateRequest;

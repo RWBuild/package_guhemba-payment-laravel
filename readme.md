@@ -58,8 +58,13 @@ To generate a payment qrcode, all what you need is to place the bellow script in
 
 ```php
   $amount = 1000;
-  $qrcode = Guhemba::generateQrcode($amount)->getQrcode();
+
+  $paymentReference = null; 
+
+  $qrcode = Guhemba::generateQrcode($amount, $paymentReference)->getQrcode();
 ```
+
+Note: when you are expecting guhemba to send you a feedback when a transaction is done
 
 ## 5. Get transaction Info using transaction token
 
