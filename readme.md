@@ -64,7 +64,17 @@ To generate a payment qrcode, all what you need is to place the bellow script in
   $qrcode = Guhemba::generateQrcode($amount, $paymentReference)->getQrcode();
 ```
 
-Note: when you are expecting guhemba to send you a feedback when a transaction is done
+Note: when you are expecting guhemba to send you a feedback when a transaction is done, then you should send the
+      `$paymentReference` when gerating a Qrcode. But also you need to provide a `payment_confirmation_endpoint` in your wallet settings. this endpoint must accept `POST` request. 
+
+      The endpoint will be hitted when the transaction is completed and it's will contain the following response:
+
+      ```php
+        [
+            'payment_reference' => 'Your-provided-payment-ref',
+            'transaction_token' => 'string'
+        ]
+      ``` 
 
 ## 5. Get transaction Info using transaction token
 
