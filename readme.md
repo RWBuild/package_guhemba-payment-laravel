@@ -57,24 +57,31 @@ All these information above, you can find them in guhemba merchant wallet under 
 To generate a payment qrcode, all what you need is to place the bellow script in your code
 
 ```php
-  $amount = 1000;
+    $amount = 1000;
 
-  $paymentReference = null; 
+    $paymentReference = 'order_id'; 
 
-  $qrcode = Guhemba::generateQrcode($amount, $paymentReference)->getQrcode();
+    $confirmPaymentKey = 'Unique_key';
+
+    $qrcode = Guhemba::generateQrcode(
+        $amount, 
+        $paymentReference,
+        $confirmPaymentKey
+    )->getQrcode();
 ```
 
 Note: when you are expecting guhemba to send you a feedback when a transaction is done, then you should send the
-      `$paymentReference` when gerating a Qrcode. But also you need to provide a `payment_confirmation_endpoint` in your wallet settings. this endpoint must accept `POST` request. 
+      `$paymentReference` when gerating a Qrcode, this is the reference of the product or group of products that your customer is buying. But also you need to provide a `payment_confirmation_endpoint` in your wallet settings on Guhemba. this endpoint must accept `POST` request. The endpoint will be hitted when the transaction is completed and it's will contain the following response:
 
-      The endpoint will be hitted when the transaction is completed and it's will contain the following response:
+```php
+    [
+        'payment_reference' => 'Your-provided-payment-ref',
+        'transaction_token' => 'string',
+        'confirm_payment_key' => 'string'
+    ]
+``` 
 
-      ```php
-        [
-            'payment_reference' => 'Your-provided-payment-ref',
-            'transaction_token' => 'string'
-        ]
-      ``` 
+The `confirm_payment_key` will help you to secure your provided `payment_confirmation_endpoint`, You shoud keep it safe After generating the qrcode because it is the unique key that will help you to check if the request is coming from guhemba.
 
 ## 5. Get transaction Info using transaction token
 
@@ -150,7 +157,7 @@ To check if the request was successfully done you can use the `isOk` method to a
     $qrcode = $generateQrcode->getQrcode();
 ```
 
-`Note`: The method `isOkay`, it's a boolean and `getMessage()` return a string.
+`Note`: The method `isOkay` is a boolean and `getMessage()` returns a string.
 
 
 <br/>

@@ -83,7 +83,10 @@ trait TransactionRequest
                 'code' => $value,
 
                 // used when generating a qrcode, it's optional
-                'payment_ref' => self::$paymentRef
+                'payment_ref' => self::$paymentRef,
+
+                // Provided to secure the feedback from guhemba
+                'confirm_payment_key' => self::$confirmPaymentKey
             ]
         ];
     }

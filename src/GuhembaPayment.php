@@ -63,6 +63,8 @@ class GuhembaPayment
      */
     public static $paymentRef = null;
 
+    public static $confirmPaymentKey = null;
+
     /**
      * Set partner keys 
      */
@@ -224,18 +226,21 @@ class GuhembaPayment
      * 
      * @param double $amount
      * @param string $paymentRef : the reference of the payment
+     * @param string $confirmPaymentKey: security layer to authenticate feedback
+     * 
      * @return self
      */
-    public static function generateQrcode($amount, $paymentRef = null)
+    public static function generateQrcode($amount, $paymentRef = null, $confirmPaymentKey = null)
     {
         $pay = new self();
 
         self::$paymentRef = $paymentRef;
 
+        self::$confirmPaymentKey = $confirmPaymentKey;
+
         $pay->response = self::caller(
             'sendQrcodeRequest', 
-            $amount, 
-            $paymentRef
+            $amount
         );
 
         return $pay;
