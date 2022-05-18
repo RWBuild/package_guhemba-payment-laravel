@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use RWBuild\Guhemba\Traits\TransactionRequest;
 use RWBuild\Guhemba\Exceptions\GuhembaPayException;
+use Illuminate\Support\Facades\Log;
 
 class GuhembaPayment
 {
@@ -71,6 +72,8 @@ class GuhembaPayment
 
     public static $shouldDump = false;
 
+    public static $shouldLogAction = false;
+
     /**
      * Set partner keys 
      */
@@ -101,6 +104,16 @@ class GuhembaPayment
     public static function dump()
     {
         static::$shouldDump = true;
+
+        return new static;
+    }
+
+    /**
+     * Mention that the actiion data should be logged
+     */
+    public static function shouldLog()
+    {
+        static::$shouldLogAction = true;
 
         return new static;
     }
@@ -365,6 +378,8 @@ class GuhembaPayment
         ]);
 
         if (static::$shouldDump) return dd($url . "/{$qrcodeSlug}?" . $query);
+
+        if (static::$shouldLogAction)  Log::info($url . "/{$qrcodeSlug}?" . $query);
 
         return redirect()->away($url . "/{$qrcodeSlug}?" . $query);
     }
