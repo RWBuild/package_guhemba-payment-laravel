@@ -1,10 +1,13 @@
 # Guhemba payment package
-A laravel-php package that facilitates the integration of guhemba payment in your application 
+
+A laravel-php package that facilitates the integration of guhemba payment in your application
 
 ## 1. Prerequisite
-- laravel framework
+
+-   laravel framework
 
 ## 2. Installation
+
 ```
  composer require rwbuild/guhemba-web-element
 ```
@@ -14,13 +17,13 @@ A laravel-php package that facilitates the integration of guhemba payment in you
 ### 3.1 Publish config file
 
 This configuration concerns systems that use a single merchant wallet for receiving payment,
-In order to start enjoying the package, you will need to publish the config file that support `Guhemba` 
+In order to start enjoying the package, you will need to publish the config file that support `Guhemba`
 
 ```
- php artisan vendor:publish --tag=config 
+ php artisan vendor:publish --tag=config
 ```
 
-After running this command you should see a `guhemba-webelement` file  under the directory `config`, then you will need to provide all information required in that file.
+After running this command you should see a `guhemba-webelement` file under the directory `config`, then you will need to provide all information required in that file.
 
 ### 3.2 Configuration for close partners
 
@@ -40,7 +43,7 @@ Then you should provide the bellow information on each request that you are perf
 ```php
     Guhemba::dynamicMerchant([
         'GUHEMBA_API_KEY' => 'wallet-merchant-integration-api-key',
-        
+
         'GUHEMBA_MERCHANT_KEY' => 'wallet-merchant-key',
 
         'GUHEMBA_PUBLIC_KEY' => 'wallet-merchant-integration-public-key',
@@ -48,6 +51,7 @@ Then you should provide the bellow information on each request that you are perf
         'GUHEMBA_REDIRECT_URL' => 'your-dynamic-url'
     ]);
 ```
+
 All these information above, you can find them in guhemba merchant wallet under the integration menu in settings Or you can request for them programatically.
 
 🤪 Now at this stage, I really feel that you are ready to go. let's enjoy the beauty of the package now 😎.
@@ -59,19 +63,19 @@ To generate a payment qrcode, all what you need is to place the bellow script in
 ```php
     $amount = 1000;
 
-    $paymentReference = 'order_id'; 
+    $paymentReference = 'order_id';
 
     $confirmPaymentKey = 'Unique_key';
 
     $qrcode = Guhemba::generateQrcode(
-        $amount, 
+        $amount,
         $paymentReference,
         $confirmPaymentKey
     )->getQrcode();
 ```
 
 Note: when you are expecting guhemba to send you a feedback when a transaction is done, then you should send the
-      `$paymentReference` when gerating a Qrcode, this is the reference of the product or group of products that your customer is buying. But also you need to provide a `payment_confirmation_endpoint` in your wallet settings on Guhemba. this endpoint must accept `POST` request. The endpoint will be hitted when the transaction is completed and it's will contain the following response:
+`$paymentReference` when gerating a Qrcode, this is the reference of the product or group of products that your customer is buying. But also you need to provide a `payment_confirmation_endpoint` in your wallet settings on Guhemba. this endpoint must accept `POST` request. The endpoint will be hitted when the transaction is completed and it's will contain the following response:
 
 ```php
     [
@@ -79,7 +83,7 @@ Note: when you are expecting guhemba to send you a feedback when a transaction i
         'transaction_token' => 'string',
         'confirm_payment_key' => 'string'
     ]
-``` 
+```
 
 The `confirm_payment_key` will help you to secure your provided `payment_confirmation_endpoint`, You shoud keep it safe After generating the qrcode because it is the unique key that will help you to check if the request is coming from guhemba.
 
@@ -116,6 +120,31 @@ The `slug` of the qrcode, you will get it after generating a qrcode and The `pay
 
 `Note` : Please make sure all information are well set in the `config file` of guhemba
 
+If you need to check the formated full url before your customer get redirected to guhemba, we give you the ability to dump
+the url
+
+```php
+    function redirectToGuhemba()
+    {
+        $qrcodeSlug ='91da-5a565f0b173c';
+        $paymentRef = 6;
+
+        return Guhemba::dump()->redirect($qrcodeSlug, $paymentRef)
+    }
+```
+
+But also the package provide another alternative for checking the redirection full url by logging it:
+
+```php
+    function redirectToGuhemba()
+    {
+        $qrcodeSlug ='91da-5a565f0b173c';
+        $paymentRef = 6;
+
+        return Guhemba::shouldLog()->redirect($qrcodeSlug, $paymentRef)
+    }
+```
+
 ## 7. Get transaction Info from a callback
 
 When the user completes the payment on guhemba, he will be redirected back to your system using the value of `GUHEMBA_REDIRECT_URL` that you have set in the config file.
@@ -129,9 +158,18 @@ Now to grab the transaction information that he has performed use this script:
     }
 ```
 
+For stateless, you can get the transaction in the following way
+
+```php
+    function guhembaCallback()
+    {
+        $transaction = Guhemba::stateless()->transaction()->getTransaction();
+    }
+```
+
 This time An extra field: `reference` will be added on the transaction `object`.
 
-## 8. Other methods that you  need to use specially for Error handling
+## 8. Other methods that you need to use specially for Error handling
 
 ### 8.1 getResponse()
 
@@ -142,11 +180,11 @@ You can call this method on all requests except the `redirect` method. For examp
     $response = Guhemba::generateQrcode($amount)->getResponse();
 ```
 
-The above script will give you the object that contains all properties of the response 
+The above script will give you the object that contains all properties of the response
 
 ### 8.1 isOk() and getMessage()
 
-To check if the request was successfully done you can use the `isOk` method to avoid bugs in your system. and also it may happen that the request was not successfully performed, at that time you will need to use the method `getMessage()` 
+To check if the request was successfully done you can use the `isOk` method to avoid bugs in your system. and also it may happen that the request was not successfully performed, at that time you will need to use the method `getMessage()`
 
 ```php
     $amount = 1000;
@@ -158,7 +196,6 @@ To check if the request was successfully done you can use the `isOk` method to a
 ```
 
 `Note`: The method `isOkay` is a boolean and `getMessage()` returns a string.
-
 
 <br/>
 Enjoy guys.
