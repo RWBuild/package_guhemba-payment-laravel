@@ -1,4 +1,5 @@
 <?php
+
 namespace RWBuild\Guhemba;
 
 use GuzzleHttp\Client;
@@ -7,11 +8,12 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use RWBuild\Guhemba\Traits\TransactionRequest;
 use RWBuild\Guhemba\Exceptions\GuhembaPayException;
+use Illuminate\Support\Facades\Log;
 
 class GuhembaPayment
 {
     use TransactionRequest;
-    
+
     /**
      * Endpoint for generating a qrcode
      */
@@ -30,7 +32,7 @@ class GuhembaPayment
     /**
      * Url where user will be redirected when click on pay button
      */
-    private static $redirectGuhembaUrl = 'rwpay-element/process-qrcode'; 
+    private static $redirectGuhembaUrl = 'rwpay-element/process-qrcode';
 
     private static $isPartner = false;
 
@@ -56,6 +58,7 @@ class GuhembaPayment
         'GUHEMBA_REDIRECT_URL' => null
     ];
 
+
     /**
      * A payment reference when generating a qrcode
      * 
@@ -64,6 +67,12 @@ class GuhembaPayment
     public static $paymentRef = null;
 
     public static $confirmPaymentKey = null;
+
+    public static $isStateless = false;
+
+    public static $shouldDump = false;
+
+    public static $shouldLogAction = false;
 
     /**
      * Set partner keys 
@@ -80,6 +89,36 @@ class GuhembaPayment
     }
 
     /**
+     * define whether the call back method should check for the state
+     */
+    public static function stateless()
+    {
+        static::$isStateless = true;
+
+        return new static;
+    }
+
+    /**
+     * dump the chained action after this method
+     */
+    public static function dump()
+    {
+        static::$shouldDump = true;
+
+        return new static;
+    }
+
+    /**
+     * Mention that the actiion data should be logged
+     */
+    public static function shouldLog()
+    {
+        static::$shouldLogAction = true;
+
+        return new static;
+    }
+
+    /**
      * Get all config guhemba keys or get a single value of a passed key
      * 
      * This method will return keys from config file or from dynamic keys
@@ -89,19 +128,18 @@ class GuhembaPayment
      */
     public static function getKeys($keyName = null)
     {
-        if (! $keyName) {
-            $keys = self::$isPartner ? 
-                        self::$dynamicKeys : 
-                        config('guhemba-webelement.option');
-           
-            if (! $keys && !self::$isPartner) throw new GuhembaPayException(
+        if (!$keyName) {
+            $keys = self::$isPartner ?
+                self::$dynamicKeys :
+                config('guhemba-webelement.option');
+
+            if (!$keys && !self::$isPartner) throw new GuhembaPayException(
                 'You should publish first the config tag'
             );
-
         } else {
-            $keys = self::$isPartner ? 
-                        self::$dynamicKeys[$keyName] :
-                        config("guhemba-webelement.option.{$keyName}");
+            $keys = self::$isPartner ?
+                self::$dynamicKeys[$keyName] :
+                config("guhemba-webelement.option.{$keyName}");
         }
 
         return $keys;
@@ -139,7 +177,7 @@ class GuhembaPayment
     {
         static::$dynamicKeys = array_merge(static::$dynamicKeys, [
             'GUHEMBA_API_KEY' => $dynamicKeys['GUHEMBA_API_KEY'],
-            
+
             'GUHEMBA_MERCHANT_KEY' => $dynamicKeys['GUHEMBA_MERCHANT_KEY'],
 
             'GUHEMBA_PUBLIC_KEY' => $dynamicKeys['GUHEMBA_PUBLIC_KEY'],
@@ -188,7 +226,7 @@ class GuhembaPayment
      */
     public function getResponse()
     {
-       return  $this->response;
+        return  $this->response;
     }
 
     /**
@@ -198,7 +236,7 @@ class GuhembaPayment
      */
     public function isOk()
     {
-       return  optional($this->response)->success;
+        return  optional($this->response)->success;
     }
 
     /**
@@ -208,7 +246,7 @@ class GuhembaPayment
      */
     public function getMessage()
     {
-       return  optional($this->response)->message;
+        return  optional($this->response)->message;
     }
 
     /**
@@ -218,7 +256,7 @@ class GuhembaPayment
      */
     private static function joinUrl($baseUrl, $endpointUrl, $isWeb = false)
     {
-        return Str::finish($baseUrl, '/') . ($isWeb ?'':'api/') .$endpointUrl;
+        return Str::finish($baseUrl, '/') . ($isWeb ? '' : 'api/') . $endpointUrl;
     }
 
     /**
@@ -239,7 +277,7 @@ class GuhembaPayment
         self::$confirmPaymentKey = $confirmPaymentKey;
 
         $pay->response = self::caller(
-            'sendQrcodeRequest', 
+            'sendQrcodeRequest',
             $amount
         );
 
@@ -293,17 +331,19 @@ class GuhembaPayment
      */
     public static function checkSessionState()
     {
-        
+
+        if (static::$isStateless) return true;
+
         $state = request()->session()->pull('guhemba_state');
         $requestState = request()->state;
 
-        if (! $requestState) return self::fireError('Request state not available', 400, [
+        if (!$requestState) return self::fireError('Request state not available', 400, [
             'hint' => 'Please make sure you are coming from guhemba'
         ]);
 
-        if (! $state) return self::fireError('Session state was not set', 400, [
-            'hint' => 'Please make sure you have been using the same' . 
-            'browser when completing payment on guhemba'
+        if (!$state) return self::fireError('Session state was not set', 400, [
+            'hint' => 'Please make sure you have been using the same' .
+                'browser when completing payment on guhemba'
         ]);
 
         if ($state != $requestState) return self::fireError("Request state don't match", 400, [
@@ -328,7 +368,7 @@ class GuhembaPayment
 
         request()->session()
             ->put('guhemba_state', $state = Str::random(40));
-        
+
         $query = http_build_query([
             'public_key' => $keys['GUHEMBA_PUBLIC_KEY'],
             static::$redirectFieldName => $keys['GUHEMBA_REDIRECT_URL'],
@@ -336,8 +376,11 @@ class GuhembaPayment
             'state' => $state,
             'ppk' => $keys['GUHEMBA_PUBLIC_PARTNER_KEY'] ?? null
         ]);
-    
+
+        if (static::$shouldDump) return dd($url . "/{$qrcodeSlug}?" . $query);
+
+        if (static::$shouldLogAction)  Log::info($url . "/{$qrcodeSlug}?" . $query);
+
         return redirect()->away($url . "/{$qrcodeSlug}?" . $query);
     }
-    
 }
