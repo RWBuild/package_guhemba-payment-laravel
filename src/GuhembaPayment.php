@@ -34,6 +34,8 @@ class GuhembaPayment
      */
     private static $redirectGuhembaUrl = 'rwpay-element/process-qrcode';
 
+    private static $transactionStatusUrl = 'third-party/transaction/check-status/from-payment-reference';
+
     private static $isPartner = false;
 
     /**
@@ -47,6 +49,18 @@ class GuhembaPayment
      * The response comming from guhemba
      */
     public $response = null;
+
+    /**
+     * used when fetching information form guhemba
+     * based on an existing qrcode
+     */
+    public $qrcodeId = null;
+
+    /**
+     * the column to use when checking the transaction status
+     * of a qrcode
+     */
+    public $checkTransactionStatusBy = 'payment_ref';
 
     public static $dynamicKeys = [
         'GUHEMBA_API_KEY' => null,
@@ -64,9 +78,9 @@ class GuhembaPayment
      * 
      * @var string
      */
-    public static $paymentRef = null;
+    public $paymentRef = null;
 
-    public static $confirmPaymentKey = null;
+    public $confirmPaymentKey = null;
 
     public static $isStateless = false;
 
@@ -254,8 +268,9 @@ class GuhembaPayment
      * 
      * @return string
      */
-    private static function joinUrl($baseUrl, $endpointUrl, $isWeb = false)
+    private static function joinUrl($endpointUrl, $isWeb = false, $baseUrl = null,)
     {
+        $baseUrl = $baseUrl ?? self::getKeys('GUHEMBA_BASE_URL');
         return Str::finish($baseUrl, '/') . ($isWeb ? '' : 'api/') . $endpointUrl;
     }
 
@@ -272,11 +287,11 @@ class GuhembaPayment
     {
         $pay = new self();
 
-        self::$paymentRef = $paymentRef;
+        $pay->paymentRef = $paymentRef;
 
-        self::$confirmPaymentKey = $confirmPaymentKey;
+        $pay->confirmPaymentKey = $confirmPaymentKey;
 
-        $pay->response = self::caller(
+        $pay->response = $pay->caller(
             'sendQrcodeRequest',
             $amount
         );
@@ -294,7 +309,40 @@ class GuhembaPayment
     {
         $pay = new self();
 
-        $pay->response = self::caller('sendTransactionRequest', $token);
+        $pay->response = $pay->caller('sendTransactionRequest', $token);
+
+        return $pay;
+    }
+
+    /**
+     * Grab a guhemba transaction qrcode from a generated qrcode
+     * under a specific merchant wallet
+     */
+    public static function transactionFromQrcode($qrcodeId)
+    {
+        $pay = new self();
+
+        $pay->paymentRef = "undefined"; // this value is required on guhemba
+        $pay->qrcodeId = $qrcodeId;
+        $pay->checkTransactionStatusBy = "qrcode_id";
+
+        $pay->response = $pay->caller('checkTransactionStatusRequest');
+
+        return $pay;
+    }
+
+    /**
+     * Grab a guhemba transaction qrcode from a payment reference
+     * under a specific merchant wallet
+     */
+    public static function transactionFromPaymentReference($paymentReference, $confirmPaymentKey = null)
+    {
+        $pay = new self();
+
+        $pay->paymentRef = $paymentReference;
+        $pay->confirmPaymentKey = $confirmPaymentKey;
+
+        $pay->response = $pay->caller('checkTransactionStatusRequest');
 
         return $pay;
     }
@@ -318,7 +366,7 @@ class GuhembaPayment
             return $pay;
         }
 
-        $pay->response = self::caller('sendTransactionCodeRequest');
+        $pay->response = $pay->caller('sendTransactionCodeRequest');
 
         return $pay;
     }
@@ -363,8 +411,7 @@ class GuhembaPayment
     public static function redirect(string $qrcodeSlug, string $paymentRef)
     {
         $keys = self::getKeys();
-        $baseUrl = $keys['GUHEMBA_BASE_URL'];
-        $url = self::joinUrl($baseUrl, self::$redirectGuhembaUrl, true);
+        $url = self::joinUrl(self::$redirectGuhembaUrl, true);
 
         request()->session()
             ->put('guhemba_state', $state = Str::random(40));

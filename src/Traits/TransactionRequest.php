@@ -1,4 +1,5 @@
 <?php
+
 namespace RWBuild\Guhemba\Traits;
 
 use GuzzleHttp\Client;
@@ -15,16 +16,17 @@ trait TransactionRequest
      * @param number $amount
      * @return object: qrcode info
      */
-    private static function sendQrcodeRequest($amount)
+    private function sendQrcodeRequest($amount)
     {
-        $baseUrl = self::getKeys('GUHEMBA_BASE_URL');
-        $url = self::joinUrl($baseUrl, self::$qrcodeUrl);
-     
+        $url = self::joinUrl(self::$qrcodeUrl);
+
         $response =  self::client()->request(
-            'POST', $url, self::buildRequestData($amount)
+            'POST',
+            $url,
+            $this->buildRequestData($amount)
         );
-    
-        return json_decode($response->getBody()->getContents()); 
+
+        return json_decode($response->getBody()->getContents());
     }
 
     /**
@@ -33,16 +35,17 @@ trait TransactionRequest
      * @param string $token
      * @return object: transaction info
      */
-    private static function sendTransactionRequest($token)
+    private function sendTransactionRequest($token)
     {
-        $baseUrl = self::getKeys('GUHEMBA_BASE_URL');
-        $url = self::joinUrl($baseUrl, self::$transactionUrl);
-    
+        $url = self::joinUrl(self::$transactionUrl);
+
         $response =  self::client()->request(
-            'POST', $url, self::buildRequestData($token)
+            'POST',
+            $url,
+            $this->buildRequestData($token)
         );
-    
-        return json_decode($response->getBody()->getContents()); 
+
+        return json_decode($response->getBody()->getContents());
     }
 
     /**
@@ -51,17 +54,35 @@ trait TransactionRequest
      * 
      * @return object: transaction info
      */
-    private static function sendTransactionCodeRequest()
+    private function sendTransactionCodeRequest()
     {
-        $baseUrl = self::getKeys('GUHEMBA_BASE_URL');
-        $url = self::joinUrl($baseUrl, self::$transCodeUrl);
+        $url = self::joinUrl(self::$transCodeUrl);
         $code = request()->code;
-    
+
         $response =  self::client()->request(
-            'POST', $url, self::buildRequestData($code)
+            'POST',
+            $url,
+            $this->buildRequestData($code)
         );
-    
-        return json_decode($response->getBody()->getContents()); 
+
+        return json_decode($response->getBody()->getContents());
+    }
+
+    /**
+     * check if a transaction exist based on a given reference
+     * (qrcode, payment_ref)
+     */
+    private function checkTransactionStatusRequest()
+    {
+        $url = self::joinUrl(self::$transactionStatusUrl);
+
+        $response =  self::client()->request(
+            'POST',
+            $url,
+            $this->buildRequestData()
+        );
+
+        return json_decode($response->getBody()->getContents());
     }
 
     /**
@@ -70,10 +91,10 @@ trait TransactionRequest
      * @param string $value: can be a "token" or "amount" 
      * @return array
      */
-    private static function buildRequestData($value)
+    private function buildRequestData($value = null)
     {
         return [
-            'headers' => self::buildRequestHeader(),
+            'headers' => $this->buildRequestHeader(),
             'form_params' => [
                 // used when user needs to fetch a transaction using a token
                 'token' => $value,
@@ -82,16 +103,27 @@ trait TransactionRequest
                 // used when user needs to fetch a transaction using a ref code
                 'code' => $value,
 
-                // used when generating a qrcode, it's optional
-                'payment_ref' => self::$paymentRef,
+                // used when generating a qrcode, but also can be used
+                // when checking the transaction status
+                'payment_ref' => $this->paymentRef,
 
-                // Provided to secure the feedback from guhemba
-                'confirm_payment_key' => self::$confirmPaymentKey
+                // Provided to secure the feedback from guhemba, but also can be used
+                // when checking the transaction status
+                'confirm_payment_key' => $this->confirmPaymentKey,
+
+                // use only when fetching something using qrcode
+                'qrcode_id' => $this->qrcodeId,
+
+                // used when checking the status of a transaction from a reference
+                'check_by' => $this->checkTransactionStatusBy,
+
+                'wallet_merchant_key' => self::getKeys()['GUHEMBA_MERCHANT_KEY'] ?? null
+
             ]
         ];
     }
 
-    private static function buildRequestHeader() 
+    private function buildRequestHeader()
     {
         $keys = self::getKeys();
 
@@ -108,12 +140,12 @@ trait TransactionRequest
     /**
      * A method to call other method and catch their error 
      */
-    private static function caller($callableMethod, $param = null)
+    private  function caller($callableMethod, ...$params)
     {
         try {
-            return self::$callableMethod($param);
+            return $this->$callableMethod(...$params);
         } catch (ClientException | ConnectException | Exception  $e) {
-            return self::handleError($e);
+            return $this->handleError($e);
         }
     }
 
@@ -122,18 +154,18 @@ trait TransactionRequest
      * 
      * @return object
      */
-    private static function handleError($exception)
+    private function handleError($exception)
     {
         $response = $exception->getResponse();
-        
-        if (! $response) return  self::fireError($exception->getMessage());
-       
+
+        if (!$response) return  $this->fireError($exception->getMessage());
+
         $statusCode = $response->getStatusCode();
         $errorResp = json_decode($response->getBody());
-       
+
         $errorMessage = $errorResp->message ?? $errorResp->error;
 
-        return self::fireError($errorMessage, $statusCode, [
+        return $this->fireError($errorMessage, $statusCode, [
             'hint' => $exception->getMessage()
         ]);
     }
@@ -143,15 +175,14 @@ trait TransactionRequest
      * 
      * @return object
      */
-    private static function fireError($msg, $status = 400, $withData = null)
+    private function fireError($msg, $status = 400, $withData = null)
     {
         try {
-            if (! $withData) throw new GuhembaPayException($msg, $status);
+            if (!$withData) throw new GuhembaPayException($msg, $status);
 
             throw ((new GuhembaPayException($msg, $status))->withData($withData));
         } catch (GuhembaPayException $e) {
             return $e->getFormatedMessage();
         }
     }
-    
 }
