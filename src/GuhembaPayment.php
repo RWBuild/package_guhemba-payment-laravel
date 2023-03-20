@@ -268,7 +268,7 @@ class GuhembaPayment
      * 
      * @return string
      */
-    private static function joinUrl($endpointUrl, $isWeb = false, $baseUrl = null,)
+    private static function joinUrl($endpointUrl, $isWeb = false, $baseUrl = null)
     {
         $baseUrl = $baseUrl ?? self::getKeys('GUHEMBA_BASE_URL');
         return Str::finish($baseUrl, '/') . ($isWeb ? '' : 'api/') . $endpointUrl;
