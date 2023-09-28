@@ -102,6 +102,19 @@ Let's say, user decides to complete the payment on guhemba web then he hits the 
     }
 ```
 
+By default this method will redirect user where he can choose a payment option(card,mtn,...). means if you already know the method that a user will pay with, you can pass the `paymentOption` to the redirect method:
+
+```php
+    function redirectToGuhemba()
+    {
+        $qrcodeSlug ='91da-5a565f0b173c';
+        $paymentRef = 6;
+        $paymentOption = "card";// can be:  mtn,card or choice(the default)
+
+        return Guhemba::redirect($qrcodeSlug, $paymentRef,$paymentOption)
+    }
+```
+
 The `slug` of the qrcode, you will get it after generating a qrcode and The `paymentRef` is the reference of the order that your customer want to pay, this reference may help you to know which product your customer has paid after accomplishing his payment on guhemba.
 
 `Note` : Please make sure all information are well set in the `config file` of guhemba
