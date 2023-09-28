@@ -89,6 +89,19 @@ class GuhembaPayment
     public static $shouldLogAction = false;
 
     /**
+     * The payment option page.based on this value
+     * the package will redirect user to an appropriate
+     * page
+     */
+    public static $paymentOption = 'choice';
+
+    static $supportedpaymentOptions = [
+        'choice',
+        'card',
+        'mtn'
+    ];
+
+    /**
      * Set partner keys 
      */
     public static function partnerKeys(array $partnerKeys)
@@ -407,11 +420,26 @@ class GuhembaPayment
      * 
      * @param string $qrcodeSlug: the qrcode identifier
      * @param string $paymentRef: a code that refer to an order
+     * @param string $paymentOption: one of choice,card,mtn
      */
-    public static function redirect(string $qrcodeSlug, string $paymentRef)
-    {
+    public static function redirect(
+        string $qrcodeSlug,
+        string $paymentRef,
+        string $paymentOption = null
+    ) {
         $keys = self::getKeys();
         $url = self::joinUrl(self::$redirectGuhembaUrl, true);
+        $paymentOption = $paymentOption ?? static::$paymentOption;
+
+        if (!in_array($paymentOption, static::$supportedpaymentOptions)) {
+            return self::fireError(
+                "Unsupported payment option: {$paymentOption}",
+                400,
+                [
+                    'hint' => 'The payment option should be one of: ' . implode(',', static::$supportedpaymentOptions)
+                ]
+            );
+        }
 
         request()->session()
             ->put('guhemba_state', $state = Str::random(40));
@@ -421,7 +449,8 @@ class GuhembaPayment
             static::$redirectFieldName => $keys['GUHEMBA_REDIRECT_URL'],
             'payment_ref' => $paymentRef,
             'state' => $state,
-            'ppk' => $keys['GUHEMBA_PUBLIC_PARTNER_KEY'] ?? null
+            'ppk' => $keys['GUHEMBA_PUBLIC_PARTNER_KEY'] ?? null,
+            'payment_option' => $paymentOption
         ]);
 
         if (static::$shouldDump) return dd($url . "/{$qrcodeSlug}?" . $query);
