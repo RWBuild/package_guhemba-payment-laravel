@@ -27,7 +27,8 @@ After running this command you should see a `guhemba-webelement` file under the 
 
 ### 3.2 Configuration for close partners
 
-Make sure that you put the bellow code on top of all your requests:
+If you don't have a guhemba partner key, then you should skip this section.
+Otherwise Make sure that you put the bellow code on top of all your requests:
 
 ```php
     \RWBuild\Guhemba\Facades\Guhemba::partnerKeys([
@@ -52,9 +53,7 @@ Then you should provide the bellow information on each request that you are perf
     ]);
 ```
 
-All these information above, you can find them in guhemba merchant wallet under the integration menu in settings Or you can request for them programatically.
-
-🤪 Now at this stage, I really feel that you are ready to go. let's enjoy the beauty of the package now 😎.
+Now at this stage, I really feel like you are ready to go. let's enjoy the package now 😎.
 
 ## 4. Generating a payment Qrcode
 
@@ -75,7 +74,7 @@ To generate a payment qrcode, all what you need is to place the bellow script in
 ```
 
 Note: when you are expecting guhemba to send you a feedback when a transaction is done, then you should send the
-`$paymentReference` when gerating a Qrcode, this is the reference of the product or group of products that your customer is buying. But also you need to provide a `payment_confirmation_endpoint` in your wallet settings on Guhemba. this endpoint must accept `POST` request. The endpoint will be hitted when the transaction is completed and it's will contain the following response:
+`$paymentReference` when generating a Qrcode, this is the reference of the product or group of products that your customer is buying. But also you need to provide a `payment_confirmation_endpoint` in your wallet settings on Guhemba. this endpoint must accept `POST` request. The endpoint will be hitted when the transaction is completed and it's will contain the following response:
 
 ```php
     [
@@ -87,20 +86,7 @@ Note: when you are expecting guhemba to send you a feedback when a transaction i
 
 The `confirm_payment_key` will help you to secure your provided `payment_confirmation_endpoint`, You shoud keep it safe After generating the qrcode because it is the unique key that will help you to check if the request is coming from guhemba.
 
-## 5. Get transaction Info using transaction token
-
-It may happen that you need to check if a payment transaction Having a given token exits in your merchant wallet on guhemba, to do that you only need the script bellow:
-
-```php
-  $token = 'S-7578987654';
-
-  $transaction = Guhemba::transactionFromToken(
-                    $token
-                )->getTransaction();
-
-```
-
-## 6. Redirect user to guhemba
+## 5. Redirect user to guhemba
 
 As guhemba payment gives a good `user interface` where the `qrcode` will appear so that user can scan it or can decide to hit the `pay` button for completing the payment on guhemba.
 
@@ -113,6 +99,19 @@ Let's say, user decides to complete the payment on guhemba web then he hits the 
         $paymentRef = 6;
 
         return Guhemba::redirect($qrcodeSlug, $paymentRef)
+    }
+```
+
+By default this method will redirect user where he can choose a payment option(card,mtn,...). means if you already know the method that a user will pay with, you can pass the `paymentOption` to the redirect method:
+
+```php
+    function redirectToGuhemba()
+    {
+        $qrcodeSlug ='91da-5a565f0b173c';
+        $paymentRef = 6;
+        $paymentOption = "card";// can be:  mtn,card or choice(the default)
+
+        return Guhemba::redirect($qrcodeSlug, $paymentRef,$paymentOption)
     }
 ```
 
@@ -145,7 +144,11 @@ But also the package provide another alternative for checking the redirection fu
     }
 ```
 
-## 7. Get transaction Info from a callback
+## 6. Fetch transaction Info
+
+You can fetch a transaction data in different ways:
+
+### 6.1 Get transaction Info from a callback
 
 When the user completes the payment on guhemba, he will be redirected back to your system using the value of `GUHEMBA_REDIRECT_URL` that you have set in the config file.
 
@@ -169,9 +172,56 @@ For stateless, you can get the transaction in the following way
 
 This time An extra field: `reference` will be added on the transaction `object`.
 
-## 8. Other methods that you need to use specially for Error handling
+### 6.2 Get transaction Info using transaction token
 
-### 8.1 getResponse()
+It may happen that you need to check if a payment transaction Having a given token exits in your merchant wallet on guhemba, to do that you only need the bellow script:
+
+```php
+  $token = 'S-7578987654';
+
+  $transaction = Guhemba::transactionFromToken(
+                    $token
+                )->getTransaction();
+
+```
+
+### 6.3 Get transaction Info using a payment reference
+
+You may need to check what happened to the transaction that you have initiated yet you don't have the transaction token, the package provides a way to check using the payment reference that you have provided when generating the qrcode
+
+```php
+    $paymentRef = "2";
+    $paymentConfirmKey = "09876545";
+    $response = Guhemba::transactionFromPaymentReference(
+        $paymentRef,
+        $paymentConfirmKey
+    );
+
+    if (!$response->isOk()) dd($response->getMessage());
+
+    $transaction = $response->getTransaction();
+```
+
+`Note`: the `$paymentConfirmKey` is optional but it is very important for fetching result with precision in case you are using your merchant wallet on different e-commerce
+
+### 6.3 Get transaction Info using a Qrcode Id
+
+You can also check if a transaction exists using the payment qrcode id that you have generated
+
+```php
+    $qrcodeId = 4;
+    $response = Guhemba::transactionFromQrcode(
+        $qrcodeId
+    );
+
+    if (!$response->isOk()) dd($response->getMessage());
+
+    $transaction = $response->getTransaction();
+```
+
+## 7. Other methods that you need to use specially for Error handling
+
+### 7.1 getResponse()
 
 You can call this method on all requests except the `redirect` method. For example you want to generate a qrcode:
 
@@ -182,7 +232,7 @@ You can call this method on all requests except the `redirect` method. For examp
 
 The above script will give you the object that contains all properties of the response
 
-### 8.1 isOk() and getMessage()
+### 7.1 isOk() and getMessage()
 
 To check if the request was successfully done you can use the `isOk` method to avoid bugs in your system. and also it may happen that the request was not successfully performed, at that time you will need to use the method `getMessage()`
 
