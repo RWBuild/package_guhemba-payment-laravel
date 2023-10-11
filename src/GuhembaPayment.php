@@ -429,7 +429,7 @@ class GuhembaPayment
     ) {
         $keys = self::getKeys();
         $url = self::joinUrl(self::$redirectGuhembaUrl, true);
-        $paymentOption = $paymentOption ?? static::$paymentOption;
+        $paymentOption = $paymentOption ?? optional(request())->payment_option ?? static::$paymentOption;
 
         if (!in_array($paymentOption, static::$supportedpaymentOptions)) {
             return self::fireError(
