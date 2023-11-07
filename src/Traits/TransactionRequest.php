@@ -158,14 +158,14 @@ trait TransactionRequest
     {
         $response = $exception->getResponse();
 
-        if (!$response) return  $this->fireError($exception->getMessage());
+        if (!$response) return  self::fireError($exception->getMessage());
 
         $statusCode = $response->getStatusCode();
         $errorResp = json_decode($response->getBody());
 
         $errorMessage = $errorResp->message ?? $errorResp->error;
 
-        return $this->fireError($errorMessage, $statusCode, [
+        return self::fireError($errorMessage, $statusCode, [
             'hint' => $exception->getMessage()
         ]);
     }
@@ -175,7 +175,7 @@ trait TransactionRequest
      * 
      * @return object
      */
-    private function fireError($msg, $status = 400, $withData = null)
+    public static function fireError($msg, $status = 400, $withData = null)
     {
         try {
             if (!$withData) throw new GuhembaPayException($msg, $status);
