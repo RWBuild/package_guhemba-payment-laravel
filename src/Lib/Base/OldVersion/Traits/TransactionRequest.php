@@ -1,6 +1,6 @@
 <?php
 
-namespace RWBuild\Guhemba\Traits;
+namespace RWBuild\Guhemba\Lib\Base\OldVersion\Traits;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
