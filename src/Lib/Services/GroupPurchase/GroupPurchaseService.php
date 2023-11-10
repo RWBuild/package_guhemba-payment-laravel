@@ -2,7 +2,7 @@
 
 namespace RWBuild\Guhemba\Lib\Services\GroupPurchase;
 
-use RWBuild\Guhemba\Lib\Services\GuhembaPaymentService;
+use RWBuild\Guhemba\Lib\Base\GuhembaPaymentBaseService;
 use RWBuild\Guhemba\Lib\Interface\GroupPurchaseServiceInterface;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Actions\CancelGroupPurchaseAction;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Actions\CreateGroupPurchaseAction;
@@ -13,7 +13,7 @@ use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CreateGroupPurchase
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\GroupPurchaseDetailResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\ReleaseGroupPurchaseResponseData;
 
-class GroupPurchaseService extends GuhembaPaymentService implements GroupPurchaseServiceInterface
+class GroupPurchaseService extends GuhembaPaymentBaseService implements GroupPurchaseServiceInterface
 {
     public function create(array $options): CreateGroupPurchaseResponseData
     {

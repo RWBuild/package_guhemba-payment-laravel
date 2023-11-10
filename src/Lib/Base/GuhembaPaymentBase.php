@@ -2,13 +2,14 @@
 
 namespace RWBuild\Guhemba\Lib\Base;
 
-use RWBuild\Guhemba\GuhembaPayment;
 use RWBuild\Guhemba\Lib\CustomData\PaymentConfigData;
+use RWBuild\Guhemba\Lib\Interface\AuthServiceInterface;
+use RWBuild\Guhemba\Lib\Interface\GroupPurchaseServiceInterface;
 use RWBuild\Guhemba\Lib\Base\OldVersion\GeneralGuhembaPaymentBase;
-use RWBuild\Guhemba\Lib\Services\GroupPurchase\GroupPurchaseService;
 
 /**
- * @property GroupPurchaseService $groupPurchase
+ * @property GroupPurchaseServiceInterface $groupPurchase
+ * @property AuthServiceInterface $auth
  */
 abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
 {
@@ -28,7 +29,7 @@ abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
     {
         $this->configData = PaymentConfigData::make(config('guhemba-webelement'));
 
-        $this->serviceRegister();
+        $this->services = $this->serviceRegister();
     }
 
     /**
@@ -42,20 +43,17 @@ abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
     /**
      * register a service with it corresponding handler callback
      */
-    public function serviceRegister()
-    {
-        $this->services = [
-            'groupPurchase' => fn () => GroupPurchaseService::make($this->configData)
-        ];
-    }
+    abstract public function serviceRegister(): array;
 
-
+    /**
+     * Build services based on accessor property
+     */
     public function __get($service)
     {
         $serviceHandler = $this->services[$service] ?? null;
 
-        if (!is_callable($serviceHandler)) return null;
+        if (!$serviceHandler) return null;
 
-        return $serviceHandler();
+        return $serviceHandler::make($this->configData);
     }
 }

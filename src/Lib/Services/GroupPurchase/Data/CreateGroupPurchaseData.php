@@ -10,7 +10,9 @@ class CreateGroupPurchaseData extends GroupPurchaseBaseData
     protected function expectedProperties(): array
     {
         return [
-            'merchant_key' => $this->dataType()->string(),
+            'merchant_wallet_key' => $this->dataType()->string(),
+            'release_callback_url?' => $this->dataType()->string(),
+            'cancel_callback_url' => $this->dataType()->string(),
             'description' => $this->dataType()->customValidator(function ($description, DataTypeHub $validator) {
                 if (!is_string($description)) {
                     $validator->message("The group purchase description must be a string");

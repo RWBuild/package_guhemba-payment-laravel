@@ -51,6 +51,11 @@ return [
     'redirect_url' => env('GUHEMBA_REDIRECT_URL'),
 
     /**
+     * The guhemba server base url
+     */
+    'base_url' =>  env('GUHEMBA_BASE_URL'),
+
+    /**
      * Special keys for guhemba partners
      */
     'partner' => [
