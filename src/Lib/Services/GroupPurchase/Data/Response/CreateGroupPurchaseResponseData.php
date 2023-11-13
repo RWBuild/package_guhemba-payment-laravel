@@ -15,10 +15,10 @@ class CreateGroupPurchaseResponseData  extends ResponseBaseData
     protected function expectedProperties(): array
     {
         return [
-            "id" => $this->dataType()->numeric(),
-            "purchase_code" => $this->dataType()->string(),
-            "status" => $this->dataType()->string(),
-            "created_at" => $this->dataType()->string(),
+            "id",
+            "purchase_code",
+            "status",
+            "created_at",
         ];
     }
 }

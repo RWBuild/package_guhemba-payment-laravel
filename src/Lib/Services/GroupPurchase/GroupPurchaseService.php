@@ -4,15 +4,15 @@ namespace RWBuild\Guhemba\Lib\Services\GroupPurchase;
 
 use RWBuild\Guhemba\Lib\Base\GuhembaPaymentBaseService;
 use RWBuild\Guhemba\Lib\Interface\GroupPurchaseServiceInterface;
+use RWBuild\Guhemba\Lib\Services\QrCode\Data\Response\QrCodeResponseData;
+use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\CancelGroupPurchaseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\CreateGroupPurchaseData;
-use RWBuild\Guhemba\Lib\Services\GroupPurchase\Actions\CancelGroupPurchaseAction;
-use RWBuild\Guhemba\Lib\Services\GroupPurchase\Actions\ReleaseGroupPurchaseAction;
-use RWBuild\Guhemba\Lib\Services\GroupPurchase\Actions\FetchGroupPurchaseDetailAction;
+use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\ReleaseGroupPurchaseData;
+use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\FetchGroupPurchaseDetailData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CancelGroupPurchaseResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CreateGroupPurchaseResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\GroupPurchaseDetailResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\ReleaseGroupPurchaseResponseData;
-use RWBuild\Guhemba\Lib\Services\QrCode\Data\Response\QrCodeResponseData;
 
 class GroupPurchaseService extends GuhembaPaymentBaseService implements GroupPurchaseServiceInterface
 {
@@ -25,17 +25,23 @@ class GroupPurchaseService extends GuhembaPaymentBaseService implements GroupPur
 
     public function info(array $options): GroupPurchaseDetailResponseData
     {
-        return FetchGroupPurchaseDetailAction::process($this->inputs($options));
+        return $this->sendRequest(
+            FetchGroupPurchaseDetailData::make($this->inputs($options))
+        );
     }
 
     public function release(array $options): ReleaseGroupPurchaseResponseData
     {
-        return ReleaseGroupPurchaseAction::process($this->inputs($options));
+        return $this->sendRequest(
+            ReleaseGroupPurchaseData::make($this->inputs($options))
+        );
     }
 
     public function cancel(array $options): CancelGroupPurchaseResponseData
     {
-        return CancelGroupPurchaseAction::process($this->inputs($options));
+        return $this->sendRequest(
+            CancelGroupPurchaseData::make($this->inputs($options))
+        );
     }
 
     public function generateQrcode(array $options): QrCodeResponseData

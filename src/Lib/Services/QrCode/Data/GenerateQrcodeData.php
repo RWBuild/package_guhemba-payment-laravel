@@ -3,7 +3,6 @@
 namespace RWBuild\Guhemba\Lib\Services\QrCode\Data;
 
 use Illuminate\Support\Arr;
-use Kakaprodo\CustomData\Lib\TypeHub\DataTypeHub;
 use RWBuild\Guhemba\Lib\CustomData\HttpDataType;
 use RWBuild\Guhemba\Lib\Services\Auth\AuthService;
 use RWBuild\Guhemba\Lib\CustomData\CollectHttpData;
