@@ -12,6 +12,7 @@ use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CancelGroupPurchase
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CreateGroupPurchaseResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\GroupPurchaseDetailResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\ReleaseGroupPurchaseResponseData;
+use RWBuild\Guhemba\Lib\Services\QrCode\Data\Response\QrCodeResponseData;
 
 class GroupPurchaseService extends GuhembaPaymentBaseService implements GroupPurchaseServiceInterface
 {
@@ -35,5 +36,14 @@ class GroupPurchaseService extends GuhembaPaymentBaseService implements GroupPur
     public function cancel(array $options): CancelGroupPurchaseResponseData
     {
         return CancelGroupPurchaseAction::process($this->inputs($options));
+    }
+
+    public function generateQrcode(array $options): QrCodeResponseData
+    {
+        $options = array_merge($options, [
+            'support_group_purchase' => true
+        ]);
+
+        return $this->gate()->qrCode->generate($options);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response;
 
-use RWBuild\Guhemba\Lib\CustomData\DataType;
+use RWBuild\Guhemba\Lib\CustomData\ResponseBaseData;
 
 /**
  * @property number id
@@ -10,7 +10,7 @@ use RWBuild\Guhemba\Lib\CustomData\DataType;
  * @property string status
  * @property string created_at
  */
-class CreateGroupPurchaseResponseData  extends DataType
+class CreateGroupPurchaseResponseData  extends ResponseBaseData
 {
     protected function expectedProperties(): array
     {
@@ -18,7 +18,7 @@ class CreateGroupPurchaseResponseData  extends DataType
             "id" => $this->dataType()->numeric(),
             "purchase_code" => $this->dataType()->string(),
             "status" => $this->dataType()->string(),
-            "created_at" => $this->dataType()->string()
+            "created_at" => $this->dataType()->string(),
         ];
     }
 }

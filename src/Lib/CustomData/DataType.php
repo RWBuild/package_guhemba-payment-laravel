@@ -7,21 +7,15 @@ use Kakaprodo\CustomData\CustomData;
 
 /**
  * @property \RWBuild\Guhemba\Lib\CustomData\PaymentConfigData $config
+ * @property GuhembaPayment guhemba_payment
  */
 abstract class DataType extends CustomData
 {
-    /**
-     * Payment services gate
-     */
-    protected $guhembaPayment;
-
     /**
      * Access to the main class of the package
      */
     public function gate(): GuhembaPayment
     {
-        if ($this->guhembaPayment) return $this->guhembaPayment;
-
-        return $this->guhembaPayment = GuhembaPayment::init();
+        return $this->guhemba_payment;
     }
 }

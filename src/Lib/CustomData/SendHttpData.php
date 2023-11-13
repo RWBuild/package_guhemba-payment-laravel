@@ -2,6 +2,7 @@
 
 namespace RWBuild\Guhemba\Lib\CustomData;
 
+use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Kakaprodo\CustomData\Lib\TypeHub\DataTypeHub;
@@ -66,5 +67,30 @@ class SendHttpData extends DataType
         return array_merge([
             'Accept' => 'application/json'
         ], $this->headers);
+    }
+
+    /**
+     * Decide how to pass response json to customData class
+     */
+    public function decideResponseDataFormat(array $responseJson): array
+    {
+        $responseJson = isset($responseJson['data'])
+            ? $responseJson['data']
+            : $responseJson;
+
+        $customDataClass = $this->response_custom_data;
+
+        $reflectionClass = new ReflectionClass($customDataClass);
+
+        //the method name that is going format response
+        $methodName = 'formatResponse';
+
+        if (!$reflectionClass->hasMethod($methodName)) return $responseJson;
+
+        if ($reflectionClass->getMethod($methodName)->isStatic()) {
+            return $customDataClass::$methodName($responseJson);
+        }
+
+        return $responseJson;
     }
 }

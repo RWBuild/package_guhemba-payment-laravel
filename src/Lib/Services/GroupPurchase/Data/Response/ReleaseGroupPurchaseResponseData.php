@@ -2,9 +2,9 @@
 
 namespace RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response;
 
-use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Base\GroupPurchaseBaseData;
+use RWBuild\Guhemba\Lib\CustomData\ResponseBaseData;
 
-class ReleaseGroupPurchaseResponseData extends GroupPurchaseBaseData
+class ReleaseGroupPurchaseResponseData extends ResponseBaseData
 {
     protected function expectedProperties(): array
     {

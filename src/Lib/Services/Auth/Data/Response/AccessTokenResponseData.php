@@ -2,13 +2,13 @@
 
 namespace RWBuild\Guhemba\Lib\Services\Auth\Data\Response;
 
-use RWBuild\Guhemba\Lib\CustomData\DataType;
+use RWBuild\Guhemba\Lib\CustomData\ResponseBaseData;
 
 /**
  * @property string token
  * @property string expires_at
  */
-class AccessTokenResponseData extends DataType
+class AccessTokenResponseData extends ResponseBaseData
 {
     protected function expectedProperties(): array
     {

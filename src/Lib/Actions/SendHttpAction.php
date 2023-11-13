@@ -13,8 +13,12 @@ class SendHttpAction extends CustomActionBuilder
 
         if ($response->failed()) return dd($response->json());
 
-        if (!$data->response_custom_data) return $response->json();
+        $responseJson = $response->json();
 
-        return $data->response_custom_data::make($response->json());
+        if (!$data->response_custom_data) return $responseJson;
+
+        return $data->response_custom_data::make(
+            $data->decideResponseDataFormat($responseJson)
+        );
     }
 }

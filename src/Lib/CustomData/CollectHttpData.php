@@ -34,6 +34,16 @@ class CollectHttpData
     }
 
     /**
+     * chain http property based on condition
+     */
+    public function when($statement, callable $mycallback)
+    {
+        if ($statement) $mycallback($this);
+
+        return $this;
+    }
+
+    /**
      * Define the http verb: post.put,get,delete
      */
     public function verb($verb): CollectHttpData

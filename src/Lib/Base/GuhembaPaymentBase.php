@@ -3,13 +3,15 @@
 namespace RWBuild\Guhemba\Lib\Base;
 
 use RWBuild\Guhemba\Lib\CustomData\PaymentConfigData;
+use RWBuild\Guhemba\Lib\Services\Qrcode\QrCodeService;
 use RWBuild\Guhemba\Lib\Interface\AuthServiceInterface;
 use RWBuild\Guhemba\Lib\Interface\GroupPurchaseServiceInterface;
 use RWBuild\Guhemba\Lib\Base\OldVersion\GeneralGuhembaPaymentBase;
 
 /**
- * @property GroupPurchaseServiceInterface $groupPurchase
- * @property AuthServiceInterface $auth
+ * @property GroupPurchaseServiceInterface $groupPurchase : The groupPurchase service
+ * @property AuthServiceInterface $auth : The auth service
+ * @property QrCodeService $qrCode : The qrcode service
  */
 abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
 {
@@ -18,7 +20,7 @@ abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
      * 
      * @var PaymentConfigData
      */
-    protected $configData;
+    public $configData;
 
     /**
      * Registered services
@@ -54,6 +56,6 @@ abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
 
         if (!$serviceHandler) return null;
 
-        return $serviceHandler::make($this->configData);
+        return $serviceHandler::make($this);
     }
 }
