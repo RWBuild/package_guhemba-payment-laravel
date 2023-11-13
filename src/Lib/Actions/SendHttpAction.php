@@ -11,7 +11,7 @@ class SendHttpAction extends CustomActionBuilder
     {
         $response =  $data->send();
 
-        if ($response->failed()) return dd($response->json());
+        if ($response->failed()) return HandleHttpErrorAction::process(['response' => $response]);
 
         $responseJson = $response->json();
 
