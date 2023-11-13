@@ -2,6 +2,7 @@
 
 namespace RWBuild\Guhemba\Lib\CustomData;
 
+use RWBuild\Guhemba\GuhembaPayment;
 use Kakaprodo\CustomData\CustomData;
 
 /**
@@ -9,4 +10,18 @@ use Kakaprodo\CustomData\CustomData;
  */
 abstract class DataType extends CustomData
 {
+    /**
+     * Payment services gate
+     */
+    protected $guhembaPayment;
+
+    /**
+     * Access to the main class of the package
+     */
+    public function gate(): GuhembaPayment
+    {
+        if ($this->guhembaPayment) return $this->guhembaPayment;
+
+        return $this->guhembaPayment = GuhembaPayment::init();
+    }
 }

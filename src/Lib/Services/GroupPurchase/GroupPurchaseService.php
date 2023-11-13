@@ -4,8 +4,8 @@ namespace RWBuild\Guhemba\Lib\Services\GroupPurchase;
 
 use RWBuild\Guhemba\Lib\Base\GuhembaPaymentBaseService;
 use RWBuild\Guhemba\Lib\Interface\GroupPurchaseServiceInterface;
+use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\CreateGroupPurchaseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Actions\CancelGroupPurchaseAction;
-use RWBuild\Guhemba\Lib\Services\GroupPurchase\Actions\CreateGroupPurchaseAction;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Actions\ReleaseGroupPurchaseAction;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Actions\FetchGroupPurchaseDetailAction;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CancelGroupPurchaseResponseData;
@@ -17,7 +17,9 @@ class GroupPurchaseService extends GuhembaPaymentBaseService implements GroupPur
 {
     public function create(array $options): CreateGroupPurchaseResponseData
     {
-        return CreateGroupPurchaseAction::process($this->inputs($options));
+        return $this->sendRequest(
+            CreateGroupPurchaseData::make($this->inputs($options))
+        );
     }
 
     public function info(array $options): GroupPurchaseDetailResponseData

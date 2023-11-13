@@ -30,8 +30,6 @@ class AuthService extends GuhembaPaymentBaseService implements AuthServiceInterf
 
     public  function partnerAccessToken(array $options = []): AccessTokenResponseData
     {
-        $options = array_merge($options, ['intent' => self::INTENT_CREATE_GROUP_PURCHASE]);
-
         return $this->sendRequest(
             RequestPartnerAccessTokenData::make($this->inputs($options))
         );

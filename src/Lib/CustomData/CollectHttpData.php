@@ -65,6 +65,18 @@ class CollectHttpData
     }
 
     /**
+     * added authorization bearer token to the headers
+     * 
+     * @param string $token
+     */
+    public function withToken($token)
+    {
+        return $this->headers([
+            'Authorization' => "Bearer {$token}"
+        ]);
+    }
+
+    /**
      * Define the request body
      */
     public function body(array $body): CollectHttpData

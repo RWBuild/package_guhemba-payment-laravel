@@ -3,7 +3,10 @@
 namespace RWBuild\Guhemba\Lib\Services\GroupPurchase\Data;
 
 use Kakaprodo\CustomData\Lib\TypeHub\DataTypeHub;
+use RWBuild\Guhemba\Lib\CustomData\CollectHttpData;
+use RWBuild\Guhemba\Lib\Services\Auth\AuthService;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Base\GroupPurchaseBaseData;
+use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CreateGroupPurchaseResponseData;
 
 class CreateGroupPurchaseData extends GroupPurchaseBaseData
 {
@@ -11,7 +14,7 @@ class CreateGroupPurchaseData extends GroupPurchaseBaseData
     {
         return [
             'merchant_wallet_key' => $this->dataType()->string(),
-            'release_callback_url?' => $this->dataType()->string(),
+            'release_callback_url?' => $this->dataType()->string(null),
             'cancel_callback_url' => $this->dataType()->string(),
             'description' => $this->dataType()->customValidator(function ($description, DataTypeHub $validator) {
                 if (!is_string($description)) {
@@ -25,7 +28,21 @@ class CreateGroupPurchaseData extends GroupPurchaseBaseData
                 }
 
                 return true;
-            })
+            }),
+            'partner_key?' => $this->dataType()->string($this->config->partner->key)
         ];
+    }
+
+    public function httpConfig(CollectHttpData $collectData)
+    {
+        $partnerToken = $this->gate()->auth->partnerAccessToken([
+            'intent' => AuthService::INTENT_CREATE_GROUP_PURCHASE
+        ]);
+
+        $collectData->verb('post')
+            ->endpoint('group-purchases/create')
+            ->withToken($partnerToken->token)
+            ->body($this->onlyValidated())
+            ->responseDataClass(CreateGroupPurchaseResponseData::class);
     }
 }
