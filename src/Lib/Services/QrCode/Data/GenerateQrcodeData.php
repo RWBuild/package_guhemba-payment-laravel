@@ -40,8 +40,7 @@ class GenerateQrcodeData extends HttpDataType
 
                 $collectData->endpoint('group-purchases/generate-qrcode')
                     ->withToken($partnerToken->token);
-            })
-            ->body(Arr::except($this->onlyValidated(), 'support_group_purchase'))
+            })->body(Arr::except($this->onlyValidated(), 'support_group_purchase'))
             ->responseDataClass(QrCodeResponseData::class);
     }
 }

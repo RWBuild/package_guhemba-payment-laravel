@@ -14,7 +14,7 @@ class SendHttpData extends DataType
     {
 
         return [
-            'verb' => $this->dataType()->inArray(['get', 'post', 'put', 'delete']),
+            'verb' => $this->dataType()->inArray(['get', 'post', 'put', 'delete', 'redirect']),
             'endpoint' => $this->dataType()->string(),
             'headers' => $this->dataType()->array([]),
             'body?' => $this->dataType()->array([]),
@@ -45,6 +45,24 @@ class SendHttpData extends DataType
     }
 
     /**
+     * Redirect away
+     */
+    public function redirect()
+    {
+        $query = http_build_query($this->body);
+
+        return redirect()->away($this->endpoint . '/?' . $query);
+    }
+
+    /**
+     * check if the http verb is about redirection
+     */
+    public function isRedirection()
+    {
+        return $this->verb == 'redirect';
+    }
+
+    /**
      * Combine guhemba base url with the provided endpoint
      */
     private function makeEndpoint()
@@ -65,7 +83,10 @@ class SendHttpData extends DataType
     private function formatHeaders()
     {
         return array_merge([
-            'Accept' => 'application/json'
+            'Accept' => 'application/json',
+            'API-KEY' => $this->config->option->api_key,
+            'MERCHANT-KEY' => $this->config->option->merchant_key,
+            'PUBLIC-KEY' => $this->config->option->public_key,
         ], $this->headers);
     }
 

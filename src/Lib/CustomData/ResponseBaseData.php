@@ -14,4 +14,12 @@ abstract class ResponseBaseData extends DataType
     {
         return $responseJson;
     }
+
+    /**
+     * convert data array to object
+     */
+    public function toObject()
+    {
+        return (object) $this->all();
+    }
 }

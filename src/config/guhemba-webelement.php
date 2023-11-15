@@ -29,6 +29,7 @@ return [
         'GUHEMBA_MERCHANT_KEY' => env('GUHEMBA_MERCHANT_KEY'),
 
         /**
+         * The Callback url:
          * The url where to redirect customers when payment is completed
          */
         'GUHEMBA_REDIRECT_URL' => env('GUHEMBA_REDIRECT_URL'),
@@ -45,8 +46,9 @@ return [
     ],
 
     /**
+     * The Callback url:
      * The url will be used by guhemba to redirect your user back to your
-     * wesite after the transaction is completed on Guhemba
+     * website after the transaction is completed on Guhemba
      */
     'redirect_url' => env('GUHEMBA_REDIRECT_URL'),
 
@@ -60,6 +62,7 @@ return [
      */
     'partner' => [
         'key' => env('PARTNER_KEY'),
+        'public_key' => env('GUHEMBA_PUBLIC_PARTNER_KEY'),
         'wallet_key' => env('PARTNER_WALLET_KEY'),
     ]
 

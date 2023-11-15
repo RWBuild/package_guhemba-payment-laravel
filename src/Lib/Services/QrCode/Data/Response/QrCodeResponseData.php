@@ -24,14 +24,15 @@ class QrCodeResponseData  extends ResponseBaseData
     protected function expectedProperties(): array
     {
         return [
-            'id' => $this->dataType()->numeric(),
-            'content' => $this->dataType()->string(),
-            'image' => $this->dataType()->string(),
-            'amount' => $this->dataType()->numeric(),
-            'transaction_type' => $this->dataType()->string(),
-            'expires_at?' => $this->dataType()->string(),
-            'wallet_name?' => $this->dataType()->string(),
-            'slug' => $this->dataType()->string(),
+            'id',
+            'content',
+            'image',
+            'amount',
+            'transaction_type',
+            'expires_at?',
+            'wallet_name?',
+            'slug',
+            'payment_ref?',
         ];
     }
 

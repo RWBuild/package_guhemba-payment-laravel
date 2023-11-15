@@ -31,8 +31,10 @@ class HandleHttpErrorData extends DataType
 
         $this->response_json = $responseJson;
 
-        $this->message = $responseJson['message'];
+        $this->message = $responseJson['message'] ?? $responseJson['error'] ?? 'undefined';
         $this->status = $this->response->status();
+
+        $this->format401Errors();
 
         $this->format422StatusErrors();
 
@@ -70,5 +72,12 @@ class HandleHttpErrorData extends DataType
         $this->reason = $dataReason['reason'];
         $this->reason_hint = $dataReason['reason_hint'];
         $this->reason_code = $dataReason['code'];
+    }
+
+    private function format401Errors()
+    {
+        if ($this->status != HttpResponse::HTTP_UNAUTHORIZED) return;
+
+        $this->message = "Unauthenticated, Please check the keys in the config file";
     }
 }

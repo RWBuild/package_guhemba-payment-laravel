@@ -4,8 +4,9 @@ namespace RWBuild\Guhemba;
 
 use RWBuild\Guhemba\Lib\Base\GuhembaPaymentBase;
 use RWBuild\Guhemba\Lib\Services\Auth\AuthService;
-use RWBuild\Guhemba\Lib\Services\GroupPurchase\GroupPurchaseService;
 use RWBuild\Guhemba\Lib\Services\Qrcode\QrCodeService;
+use RWBuild\Guhemba\Lib\Services\Transaction\TransactionService;
+use RWBuild\Guhemba\Lib\Services\GroupPurchase\GroupPurchaseService;
 
 class GuhembaPayment extends GuhembaPaymentBase
 {
@@ -17,7 +18,8 @@ class GuhembaPayment extends GuhembaPaymentBase
         return [
             'groupPurchase' => GroupPurchaseService::class,
             'auth' => AuthService::class,
-            'qrCode' => QrCodeService::class
+            'qrCode' => QrCodeService::class,
+            'transaction' => TransactionService::class,
         ];
     }
 }

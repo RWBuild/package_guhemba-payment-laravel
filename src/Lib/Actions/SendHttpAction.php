@@ -9,6 +9,8 @@ class SendHttpAction extends CustomActionBuilder
 {
     public function handle(SendHttpData $data)
     {
+        if ($data->isRedirection()) return $data->redirect();
+
         $response =  $data->send();
 
         if ($response->failed()) return HandleHttpErrorAction::process(['response' => $response]);

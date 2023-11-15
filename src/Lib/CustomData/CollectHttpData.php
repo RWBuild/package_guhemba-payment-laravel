@@ -4,16 +4,6 @@ namespace RWBuild\Guhemba\Lib\CustomData;
 
 use RWBuild\Guhemba\Lib\CustomData\PaymentConfigData;
 
-
-$initialData = [
-    'verb' => null,
-    'endpoint' => null,
-    'headers' => [],
-    'body' => [],
-    'response_custom_data' =>  null,
-    'config' => null
-];
-
 /**
  * collect data for http request
  */
@@ -23,7 +13,13 @@ class CollectHttpData
     /**
      * Data we need to send the http request to guhemba
      */
-    protected $httpData = [];
+    protected $httpData = [
+        'verb' => null,
+        'endpoint' => null,
+        'headers' => [],
+        'body' => [],
+        'response_custom_data' =>  null
+    ];
 
     /**
      * Create the instance
@@ -44,7 +40,7 @@ class CollectHttpData
     }
 
     /**
-     * Define the http verb: post.put,get,delete
+     * Define the http verb: post.put,get,delete or redirect
      */
     public function verb($verb): CollectHttpData
     {
@@ -123,5 +119,10 @@ class CollectHttpData
     public function all(): array
     {
         return $this->httpData;
+    }
+
+    public function __get($property)
+    {
+        return $this->httpData[$property] ?? null;
     }
 }

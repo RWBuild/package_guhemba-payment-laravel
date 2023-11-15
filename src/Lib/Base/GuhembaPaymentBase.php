@@ -3,15 +3,17 @@
 namespace RWBuild\Guhemba\Lib\Base;
 
 use RWBuild\Guhemba\Lib\CustomData\PaymentConfigData;
-use RWBuild\Guhemba\Lib\Services\Qrcode\QrCodeService;
 use RWBuild\Guhemba\Lib\Interface\AuthServiceInterface;
+use RWBuild\Guhemba\Lib\Interface\QrCodeServiceInterface;
+use RWBuild\Guhemba\Lib\Interface\TransactionServiceInterface;
 use RWBuild\Guhemba\Lib\Interface\GroupPurchaseServiceInterface;
 use RWBuild\Guhemba\Lib\Base\OldVersion\GeneralGuhembaPaymentBase;
 
 /**
  * @property GroupPurchaseServiceInterface $groupPurchase : The groupPurchase service
  * @property AuthServiceInterface $auth : The auth service
- * @property QrCodeService $qrCode : The qrcode service
+ * @property QrCodeServiceInterface $qrCode : The qrcode service
+ * @property TransactionServiceInterface transaction: the transaction service
  */
 abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
 {

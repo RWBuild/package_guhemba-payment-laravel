@@ -14,7 +14,7 @@ use RWBuild\Guhemba\Lib\Base\OldVersion\Traits\TransactionRequest;
  * 
  * Wee keep the old way to support the old version
  */
-abstract class GeneralGuhembaPaymentBase
+class GeneralGuhembaPaymentBase
 {
     use TransactionRequest;
 
@@ -373,49 +373,11 @@ abstract class GeneralGuhembaPaymentBase
      */
     public static function transaction()
     {
-        $validateRequest = self::checkSessionState();
-
         $pay = new self();
-
-        if ($validateRequest !== true) {
-            $pay->response = $validateRequest;
-
-            return $pay;
-        }
 
         $pay->response = $pay->caller('sendTransactionCodeRequest');
 
         return $pay;
-    }
-
-    /**
-     * Check if the callback request has the same state with 
-     * the state sent in the redirect to guhemba request 
-     * 
-     * @return boolean|object
-     */
-    public static function checkSessionState()
-    {
-
-        if (static::$isStateless) return true;
-
-        $state = request()->session()->pull('guhemba_state');
-        $requestState = request()->state;
-
-        if (!$requestState) return self::fireError('Request state not available', 400, [
-            'hint' => 'Please make sure you are coming from guhemba'
-        ]);
-
-        if (!$state) return self::fireError('Session state was not set', 400, [
-            'hint' => 'Please make sure you have been using the same' .
-                'browser when completing payment on guhemba'
-        ]);
-
-        if ($state != $requestState) return self::fireError("Request state don't match", 400, [
-            'hint' => 'Please make sure you are not using the callback url twice'
-        ]);
-
-        return true;
     }
 
     /**
@@ -445,14 +407,11 @@ abstract class GeneralGuhembaPaymentBase
             );
         }
 
-        request()->session()
-            ->put('guhemba_state', $state = Str::random(40));
-
         $query = http_build_query([
             'public_key' => $keys['GUHEMBA_PUBLIC_KEY'],
             static::$redirectFieldName => $keys['GUHEMBA_REDIRECT_URL'],
             'payment_ref' => $paymentRef,
-            'state' => $state,
+            'state' => 'no-longer-supported',
             'ppk' => $keys['GUHEMBA_PUBLIC_PARTNER_KEY'] ?? null,
             'payment_option' => $paymentOption
         ]);

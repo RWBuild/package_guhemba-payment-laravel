@@ -5,10 +5,10 @@ namespace RWBuild\Guhemba\Lib\CustomData\Partial;
 use RWBuild\Guhemba\Lib\CustomData\DataType;
 
 /**
- * @property string api_key
- * @property string merchant_key
- * @property string redirect_url
- * @property string public_key
+ * @property string api_key : The Merchant Api key
+ * @property string merchant_key : The Merchant key
+ * @property string redirect_url : Merchant public key
+ * @property string public_key : Merchant public key
  * @property string base_url
  */
 class ConfigMerchantOptionData extends DataType
