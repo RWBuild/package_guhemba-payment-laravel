@@ -8,6 +8,18 @@ use RWBuild\Guhemba\Lib\Services\Transaction\Data\Response\TransactionReferenceD
 
 /**
  * @property numeric id
+ * @property numeric qr_code_id
+ * @property bool is_pending
+ * @property numeric amount
+ * @property string description
+ * @property string transaction_type
+ * @property string transaction_token
+ * @property string created_at
+ * @property string updated_at
+ * @property string net_amount
+ * @property TransactionReferenceData reference
+ * @property string payment_method
+ * @property TransactionFeeData transaction_fee
  */
 class TransactionResponseData  extends ResponseBaseData
 {
@@ -16,13 +28,13 @@ class TransactionResponseData  extends ResponseBaseData
         return [
             "id?",
             "qr_code_id?",
+            'is_pending?',
             "amount?",
             "description?",
             "transaction_type?",
             "transaction_token?",
             "created_at?",
             "updated_at?",
-            "fees?",
             "net_amount?",
             "tip_amount?",
             "reference?" => $this->dataType(TransactionReferenceData::class),
@@ -39,5 +51,15 @@ class TransactionResponseData  extends ResponseBaseData
     {
         // it will empty in case no transaction was found
         return $responseJson['transaction'] ?? [];
+    }
+
+    /**
+     * check if the transaction
+     */
+    public function isCompleted(): bool
+    {
+        if (!$this->id) return false;
+
+        return $this->is_pending == false;
     }
 }

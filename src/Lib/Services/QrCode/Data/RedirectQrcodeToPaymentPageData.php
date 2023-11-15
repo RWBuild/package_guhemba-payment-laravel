@@ -48,8 +48,8 @@ class RedirectQrcodeToPaymentPageData extends HttpDataType
             // check if the partner public key exists
             $this->config->partner->throwWhenFieldAbsent(
                 'public_key',
-                'When you provide the redirect_url, You must consider providing'
-                    . ' the The partner public key in the configuration file'
+                'When you provide a dynamic redirect_url, You must consider providing'
+                    . ' the partner public key in the configuration file'
             );
         } else {
             // check if the merchant redirect_url  exists

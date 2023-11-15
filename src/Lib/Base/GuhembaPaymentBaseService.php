@@ -23,6 +23,11 @@ abstract class GuhembaPaymentBaseService
      */
     protected $guhembaPayment;
 
+    /**
+     * Keeps the error handling callback
+     */
+    protected $errorHandlerCallback = null;
+
     public function __construct(GuhembaPayment $guhembaPayment)
     {
         $this->guhembaPayment = $guhembaPayment;
@@ -57,6 +62,16 @@ abstract class GuhembaPaymentBaseService
     }
 
     /**
+     * Listen when error occurs
+     */
+    public function onError(callable $handler)
+    {
+        $this->errorHandlerCallback = $handler;
+
+        return $this;
+    }
+
+    /**
      * Send http request to guhemba
      */
     public function sendRequest(HttpDataType $data)
@@ -67,6 +82,12 @@ abstract class GuhembaPaymentBaseService
 
         $data->httpConfig($httpData);
 
-        return SendHttpAction::process($httpData->all());
+        try {
+            return SendHttpAction::process($httpData->all());
+        } catch (\Throwable $th) {
+            if (is_callable($this->errorHandlerCallback)) ($this->errorHandlerCallback)($th);
+
+            throw $th;
+        }
     }
 }
