@@ -1,6 +1,20 @@
 # Guhemba payment package
 
-A laravel-php package that facilitates the integration of guhemba payment in your application
+A laravel-php package that facilitates the integration of guhemba payment api in your application
+
+# [Official Documentation](https://yupidoc.com/projects/guhemba-webelement/preview)
+
+From the version `>=3.0.0` , You can find the official [documentation here](https://yupidoc.com/projects/guhemba-webelement/preview)
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+# OLD VERSIONS DOCUMENTATION(<=v2.1.2)
+
+At this page you will see the documentation of this package form v0 - v2.1.2
 
 ## 1. Prerequisite
 
