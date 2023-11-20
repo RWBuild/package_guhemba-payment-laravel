@@ -4,11 +4,12 @@ namespace RWBuild\Guhemba\Lib\Services\Transaction;
 
 use RWBuild\Guhemba\Lib\Base\GuhembaPaymentBaseService;
 use RWBuild\Guhemba\Lib\Interface\TransactionServiceInterface;
-use RWBuild\Guhemba\Lib\Services\Transaction\Data\FetchTransactionFromCallbackData;
-use RWBuild\Guhemba\Lib\Services\Transaction\Data\FetchTransactionFromQrcodeData;
-use RWBuild\Guhemba\Lib\Services\Transaction\Data\FetchTransactionFromReferenceData;
+use RWBuild\Guhemba\Lib\Services\Transaction\Data\RefundTransactionData;
 use RWBuild\Guhemba\Lib\Services\Transaction\Data\FetchTransactionFromTokenData;
+use RWBuild\Guhemba\Lib\Services\Transaction\Data\FetchTransactionFromQrcodeData;
+use RWBuild\Guhemba\Lib\Services\Transaction\Data\FetchTransactionFromCallbackData;
 use RWBuild\Guhemba\Lib\Services\Transaction\Data\Response\TransactionResponseData;
+use RWBuild\Guhemba\Lib\Services\Transaction\Data\FetchTransactionFromReferenceData;
 
 class TransactionService extends GuhembaPaymentBaseService implements TransactionServiceInterface
 {
@@ -41,6 +42,13 @@ class TransactionService extends GuhembaPaymentBaseService implements Transactio
     {
         return $this->sendRequest(
             FetchTransactionFromReferenceData::make($this->inputs($options))
+        );
+    }
+
+    public function refund(array $options): TransactionResponseData
+    {
+        return $this->sendRequest(
+            RefundTransactionData::make($this->inputs($options))
         );
     }
 }

@@ -27,4 +27,9 @@ interface TransactionServiceInterface extends ServiceBaseInterface
      * Fetch transaction from qrcode payment_ref
      */
     public function fetchFromReference(array $options): TransactionResponseData;
+
+    /**
+     * Refund a payment transaction
+     */
+    public function refund(array $options): TransactionResponseData;
 }
