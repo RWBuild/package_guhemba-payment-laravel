@@ -4,6 +4,7 @@ namespace RWBuild\Guhemba\Lib\Interface;
 
 use Illuminate\Http\RedirectResponse;
 use RWBuild\Guhemba\Lib\Interface\Base\ServiceBaseInterface;
+use RWBuild\Guhemba\Lib\CustomData\Response\SuccessResponseData;
 use RWBuild\Guhemba\Lib\Services\QrCode\Data\Response\QrCodeResponseData;
 
 interface QrCodeServiceInterface extends ServiceBaseInterface
@@ -21,5 +22,5 @@ interface QrCodeServiceInterface extends ServiceBaseInterface
     /**
      * Send the payment approval process to a guhemba account
      */
-    public function requestPaymentApproval(array $options = []);
+    public function requestPaymentApproval(array $options = []): SuccessResponseData;
 }

@@ -13,7 +13,7 @@ class CreateGroupPurchaseData extends GroupPurchaseBaseData
     protected function expectedProperties(): array
     {
         return [
-            'merchant_wallet_key' => $this->dataType()->string(),
+            'merchant_wallet_key?' => $this->dataType()->string(),
             'release_callback_url?' => $this->dataType()->string(null),
             'cancel_callback_url' => $this->dataType()->string(),
             'description' => $this->dataType()->customValidator(function ($description, DataTypeHub $validator) {

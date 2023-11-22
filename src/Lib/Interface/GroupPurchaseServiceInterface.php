@@ -3,11 +3,12 @@
 namespace RWBuild\Guhemba\Lib\Interface;
 
 use RWBuild\Guhemba\Lib\Interface\Base\ServiceBaseInterface;
+use RWBuild\Guhemba\Lib\CustomData\Response\SuccessResponseData;
+use RWBuild\Guhemba\Lib\Services\QrCode\Data\Response\QrCodeResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CancelGroupPurchaseResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CreateGroupPurchaseResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\GroupPurchaseDetailResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\ReleaseGroupPurchaseResponseData;
-use RWBuild\Guhemba\Lib\Services\QrCode\Data\Response\QrCodeResponseData;
 
 interface GroupPurchaseServiceInterface extends ServiceBaseInterface
 {
@@ -35,4 +36,9 @@ interface GroupPurchaseServiceInterface extends ServiceBaseInterface
      * Generate payment qrcode for a given group purchase code
      */
     public function generateQrcode(array $options): QrCodeResponseData;
+
+    /**
+     * Add a merchant to an existing group purchase
+     */
+    public function addMerchant(array $options): SuccessResponseData;
 }
