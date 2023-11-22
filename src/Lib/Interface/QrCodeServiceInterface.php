@@ -17,4 +17,9 @@ interface QrCodeServiceInterface extends ServiceBaseInterface
      * Redirect to the guhemba payment page of the qrcode
      */
     public function redirect(array $options = []): RedirectResponse;
+
+    /**
+     * Send the payment approval process to a guhemba account
+     */
+    public function requestPaymentApproval(array $options = []);
 }
