@@ -11,8 +11,8 @@ class RequestPaymentApprovalData extends HttpDataType
     protected function expectedProperties(): array
     {
         return [
-            'customer_atname' => $this->dataType()->string(),
-            'qrcode_slug' => $this->dataType()->string(),
+            'customer_atname' => $this->dataType()->string(request()->customer_atname),
+            'qrcode_slug' => $this->dataType()->string(request()->qrcode_slug),
         ];
     }
 
