@@ -5,6 +5,7 @@ namespace RWBuild\Guhemba\Lib\Services\Qrcode;
 use Illuminate\Http\RedirectResponse;
 use RWBuild\Guhemba\Lib\Base\GuhembaPaymentBaseService;
 use RWBuild\Guhemba\Lib\Interface\QrCodeServiceInterface;
+use RWBuild\Guhemba\Lib\CustomData\Response\SuccessResponseData;
 use RWBuild\Guhemba\Lib\Services\QrCode\Data\GenerateQrcodeData;
 use RWBuild\Guhemba\Lib\Services\QrCode\Data\RequestPaymentApprovalData;
 use RWBuild\Guhemba\Lib\Services\QrCode\Data\Response\QrCodeResponseData;
@@ -26,7 +27,7 @@ class QrCodeService extends GuhembaPaymentBaseService implements QrCodeServiceIn
         );
     }
 
-    public function requestPaymentApproval(array $options = [])
+    public function requestPaymentApproval(array $options = []): SuccessResponseData
     {
         return $this->sendRequest(
             RequestPaymentApprovalData::make($this->inputs($options))

@@ -3,11 +3,13 @@
 namespace RWBuild\Guhemba\Lib\Services\GroupPurchase;
 
 use RWBuild\Guhemba\Lib\Base\GuhembaPaymentBaseService;
+use RWBuild\Guhemba\Lib\CustomData\Response\SuccessResponseData;
 use RWBuild\Guhemba\Lib\Interface\GroupPurchaseServiceInterface;
 use RWBuild\Guhemba\Lib\Services\QrCode\Data\Response\QrCodeResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\CancelGroupPurchaseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\CreateGroupPurchaseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\ReleaseGroupPurchaseData;
+use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\AddGroupPurchaseMerchantData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\FetchGroupPurchaseDetailData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CancelGroupPurchaseResponseData;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\Data\Response\CreateGroupPurchaseResponseData;
@@ -51,5 +53,12 @@ class GroupPurchaseService extends GuhembaPaymentBaseService implements GroupPur
         ]);
 
         return $this->gate()->qrCode->generate($options);
+    }
+
+    public function addMerchant(array $options): SuccessResponseData
+    {
+        return $this->sendRequest(
+            AddGroupPurchaseMerchantData::make($this->inputs($options))
+        );
     }
 }
