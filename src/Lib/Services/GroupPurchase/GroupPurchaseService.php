@@ -52,7 +52,11 @@ class GroupPurchaseService extends GuhembaPaymentBaseService implements GroupPur
             'support_group_purchase' => true
         ]);
 
-        return $this->gate()->qrCode->generate($options);
+        $qrCodeService =  $this->gate()->qrCode;
+
+        if (is_callable($this->errorHandlerCallback)) $qrCodeService->onError($this->errorHandlerCallback);
+
+        return $qrCodeService->generate($options);
     }
 
     public function addMerchant(array $options): SuccessResponseData
