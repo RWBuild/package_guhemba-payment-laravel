@@ -29,6 +29,11 @@ abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
      */
     protected $services = [];
 
+    /**
+     * Keeps the error handling callback
+     */
+    protected $errorHandlerCallback = null;
+
     public function __construct()
     {
         $this->configData = PaymentConfigData::make(config('guhemba-webelement'));
@@ -48,6 +53,30 @@ abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
      * register a service with it corresponding handler callback
      */
     abstract public function serviceRegister(): array;
+
+    /**
+     * Register a global error handling
+     */
+    public function globalHttpErrorListener(callable $error)
+    {
+        $this->errorHandlerCallback = $error;
+
+        return $this;
+    }
+
+    /**
+     * Execute an action and catch any occured error
+     */
+    public function executeAction(callable $actionToExecute)
+    {
+        try {
+            return $actionToExecute();
+        } catch (\Throwable $th) {
+            if (is_callable($this->errorHandlerCallback)) return ($this->errorHandlerCallback)($th);
+
+            throw $th;
+        }
+    }
 
     /**
      * Build services based on accessor property

@@ -6,7 +6,6 @@ use RWBuild\Guhemba\GuhembaPayment;
 use RWBuild\Guhemba\Lib\Actions\SendHttpAction;
 use RWBuild\Guhemba\Lib\CustomData\HttpDataType;
 use RWBuild\Guhemba\Lib\CustomData\CollectHttpData;
-use RWBuild\Guhemba\Lib\CustomData\PaymentConfigData;
 
 
 abstract class GuhembaPaymentBaseService
@@ -22,11 +21,6 @@ abstract class GuhembaPaymentBaseService
      * @var GuhembaPayment
      */
     protected $guhembaPayment;
-
-    /**
-     * Keeps the error handling callback
-     */
-    protected $errorHandlerCallback = null;
 
     public function __construct(GuhembaPayment $guhembaPayment)
     {
@@ -66,7 +60,7 @@ abstract class GuhembaPaymentBaseService
      */
     public function onError(callable $handler)
     {
-        $this->errorHandlerCallback = $handler;
+        $this->guhembaPayment->globalHttpErrorListener($handler);
 
         return $this;
     }
@@ -82,12 +76,8 @@ abstract class GuhembaPaymentBaseService
 
         $data->httpConfig($httpData);
 
-        try {
-            return SendHttpAction::process($httpData->all());
-        } catch (\Throwable $th) {
-            if (is_callable($this->errorHandlerCallback)) ($this->errorHandlerCallback)($th);
-
-            throw $th;
-        }
+        return $this->guhembaPayment->executeAction(
+            fn () => SendHttpAction::process($httpData->all())
+        );
     }
 }

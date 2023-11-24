@@ -32,4 +32,9 @@ class GuhembaHttpException extends Exception
     {
         return Arr::except($this->data->all(), ['response_json', 'response']);
     }
+
+    public function __get($name)
+    {
+        return $this->data->$name;
+    }
 }
