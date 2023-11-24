@@ -22,6 +22,11 @@ abstract class GuhembaPaymentBaseService
      */
     protected $guhembaPayment;
 
+    /**
+     * a exception error handler for a specific service action
+     */
+    protected $localHttExceptioError = null;
+
     public function __construct(GuhembaPayment $guhembaPayment)
     {
         $this->guhembaPayment = $guhembaPayment;
@@ -60,6 +65,10 @@ abstract class GuhembaPaymentBaseService
      */
     public function onError(callable $handler)
     {
+        $this->localHttExceptioError = $handler;
+
+        // in case there is an internal service that didn't register a error handler, 
+        // this handler will be used
         $this->guhembaPayment->globalHttpErrorListener($handler);
 
         return $this;
@@ -77,7 +86,8 @@ abstract class GuhembaPaymentBaseService
         $data->httpConfig($httpData);
 
         return $this->guhembaPayment->executeAction(
-            fn () => SendHttpAction::process($httpData->all())
+            fn () => SendHttpAction::process($httpData->all()),
+            $this->localHttExceptioError
         );
     }
 }

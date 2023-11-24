@@ -67,12 +67,15 @@ abstract class GuhembaPaymentBase extends GeneralGuhembaPaymentBase
     /**
      * Execute an action and catch any occured error
      */
-    public function executeAction(callable $actionToExecute)
+    public function executeAction(callable $actionToExecute, $actionErrorHandler = null)
     {
         try {
             return $actionToExecute();
         } catch (\Throwable $th) {
-            if (is_callable($this->errorHandlerCallback)) return ($this->errorHandlerCallback)($th);
+
+            $errorHnadler = $actionErrorHandler  ?? $this->errorHandlerCallback;
+
+            if (is_callable($errorHnadler)) return $errorHnadler($th);
 
             throw $th;
         }
