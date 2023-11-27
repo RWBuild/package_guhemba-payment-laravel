@@ -25,7 +25,7 @@ class ReleaseGroupPurchaseResponseData extends ResponseBaseData
             "created_at",
             'total_amount?',
             'released_amount?',
-            'closed_at',
+            'closed_at?',
             'released_transaction_token'
         ];
     }

@@ -18,12 +18,12 @@ class CancelGroupPurchaseResponseData extends ResponseBaseData
     protected function expectedProperties(): array
     {
         return [
-            "id",
-            "purchase_code",
-            "status",
-            "created_at",
-            'total_amount',
-            'closed_at',
+            "id?",
+            "purchase_code?",
+            "status?",
+            "created_at?",
+            'total_amount?',
+            'closed_at?',
             'has_webhook_confirmation'
         ];
     }
