@@ -4,7 +4,7 @@ namespace RWBuild\Guhemba\Lib\Base;
 
 use RWBuild\Guhemba\Lib\Services\Auth\AuthService;
 use RWBuild\Guhemba\Lib\CustomData\PaymentConfigData;
-use RWBuild\Guhemba\Lib\Services\Qrcode\QrCodeService;
+use RWBuild\Guhemba\Lib\Services\QrCode\QrCodeService;
 use RWBuild\Guhemba\Lib\Services\Transaction\TransactionService;
 use RWBuild\Guhemba\Lib\Base\OldVersion\GeneralGuhembaPaymentBase;
 use RWBuild\Guhemba\Lib\Services\GroupPurchase\GroupPurchaseService;
