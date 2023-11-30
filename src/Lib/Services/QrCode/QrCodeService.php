@@ -1,6 +1,6 @@
 <?php
 
-namespace RWBuild\Guhemba\Lib\Services\Qrcode;
+namespace RWBuild\Guhemba\Lib\Services\QrCode;
 
 use Illuminate\Http\RedirectResponse;
 use RWBuild\Guhemba\Lib\Base\GuhembaPaymentBaseService;
