@@ -63,7 +63,7 @@ return [
     'partner' => [
         'key' => env('PARTNER_KEY'),
         'public_key' => env('GUHEMBA_PUBLIC_PARTNER_KEY'),
-        'wallet_key' => env('PARTNER_WALLET_KEY'),
+        'wallet_key' => env('PARTNER_WALLET_KEY', env('GUHEMBA_MERCHANT_KEY')),
     ]
 
 ];

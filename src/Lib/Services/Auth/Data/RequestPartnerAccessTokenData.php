@@ -18,7 +18,7 @@ class RequestPartnerAccessTokenData extends HttpDataType
         return [
             'partner_key' => $this->dataType()->string($this->config->partner->key),
             'partner_wallet_key' => $this->dataType()->string($this->config->partner->wallet_key),
-            'intent' => $this->dataType()->inArray(AuthService::$supportedIntents),
+            'intent' => $this->dataType()->inArray(AuthService::$supportedPartnerIntents),
         ];
     }
 
