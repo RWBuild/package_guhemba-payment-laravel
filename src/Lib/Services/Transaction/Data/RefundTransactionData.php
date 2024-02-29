@@ -13,18 +13,22 @@ class RefundTransactionData  extends HttpDataType
     {
         return [
             'transaction_id' => $this->dataType()->number(),
+            'merchant_is_partner?' => $this->dataType()->bool(true)
         ];
     }
 
     public function httpConfig(CollectHttpData $collectData)
     {
-        $partnerToken = $this->gate()->auth->partnerAccessToken([
-            'intent' => AuthService::INTENT_REFUND_PAYMENT
-        ]);
+        $authService = $this->gate()->auth;
+        $accessToken = $this->merchant_is_partner ?
+            $authService->partnerAccessToken(['intent' => AuthService::INTENT_REFUND_PAYMENT])
+            : $authService->walletPersonalAccessToken([
+                'intents' => [AuthService::TOKENSCOPE_REFUND_FROM_3DPARTY]
+            ]);
 
         $collectData->verb('post')
             ->endpoint('transactions/refund')
-            ->withToken($partnerToken->token)
+            ->withToken($accessToken->token)
             ->body($this->onlyValidated())
             ->responseDataClass(TransactionResponseData::class);
     }

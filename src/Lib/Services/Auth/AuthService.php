@@ -6,9 +6,13 @@ use RWBuild\Guhemba\Lib\Base\GuhembaPaymentBaseService;
 use RWBuild\Guhemba\Lib\Interface\AuthServiceInterface;
 use RWBuild\Guhemba\Lib\Services\Auth\Data\RequestPartnerAccessTokenData;
 use RWBuild\Guhemba\Lib\Services\Auth\Data\Response\AccessTokenResponseData;
+use RWBuild\Guhemba\Lib\Services\Auth\Data\RequestWalletPersonalAccessTokenData;
 
 class AuthService extends GuhembaPaymentBaseService implements AuthServiceInterface
 {
+    /**
+     * Partners intens or scopes names
+     */
     const INTENT_CREATE_GROUP_PURCHASE = "create-group-purchase";
     const INTENT_RELEASE_GROUP_PURCHASE = "release-group-purchase";
     const INTENT_CANCEL_GROUP_PURCHASE = "cancel-group-purchase";
@@ -19,7 +23,7 @@ class AuthService extends GuhembaPaymentBaseService implements AuthServiceInterf
     /**
      * all supported partner INTENT names
      */
-    static $supportedIntents = [
+    static $supportedPartnerIntents = [
         self::INTENT_CREATE_GROUP_PURCHASE,
         self::INTENT_RELEASE_GROUP_PURCHASE,
         self::INTENT_CANCEL_GROUP_PURCHASE,
@@ -28,10 +32,25 @@ class AuthService extends GuhembaPaymentBaseService implements AuthServiceInterf
         self::INTENT_REFUND_PAYMENT
     ];
 
+    /**
+     * Non partner  merchant wallets scopes names
+     */
+    const TOKENSCOPE_REFUND_FROM_3DPARTY = 'refund_from_3dparty';
+    static $supportedWalletIntents = [
+        self::TOKENSCOPE_REFUND_FROM_3DPARTY
+    ];
+
     public  function partnerAccessToken(array $options = []): AccessTokenResponseData
     {
         return $this->sendRequest(
             RequestPartnerAccessTokenData::make($this->inputs($options))
+        );
+    }
+
+    public  function walletPersonalAccessToken(array $options = []): AccessTokenResponseData
+    {
+        return $this->sendRequest(
+            RequestWalletPersonalAccessTokenData::make($this->inputs($options))
         );
     }
 }
