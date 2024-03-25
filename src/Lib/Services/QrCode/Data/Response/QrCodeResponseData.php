@@ -18,6 +18,7 @@ use RWBuild\Guhemba\Lib\CustomData\ResponseBaseData;
  * @property string payment_ref
  * @property string confirm_payment_key
  * @property string web_element_page
+ * @property array supported_payment_options
  */
 class QrCodeResponseData  extends ResponseBaseData
 {
@@ -33,6 +34,10 @@ class QrCodeResponseData  extends ResponseBaseData
             'wallet_name?',
             'slug',
             'payment_ref?',
+            'supported_payment_options?',
+
+            // used by the package
+            'public_auth_key?' => $this->dataType()->string()->default($this->encryptedKey())
         ];
     }
 
