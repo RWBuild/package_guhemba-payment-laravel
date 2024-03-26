@@ -16,6 +16,16 @@ abstract class DataType extends CustomData
      */
     public function gate(): GuhembaPayment
     {
-        return $this->guhemba_payment;
+        return $this->guhemba_payment ?? GuhembaPayment::init();
+    }
+
+    /**
+     * Encrypt some merchant keys for future authentication
+     */
+    public function encryptedKey()
+    {
+        $config = $this->gate()->configData;
+
+        return  $config->encryptedKey();
     }
 }

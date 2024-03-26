@@ -38,7 +38,6 @@ class SendHttpData extends DataType
     public function send()
     {
         $verb = $this->verb;
-
         return Http::withHeaders(
             $this->formatHeaders()
         )->$verb($this->makeEndpoint(), $this->body);
