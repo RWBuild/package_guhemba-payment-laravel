@@ -62,7 +62,7 @@ class RedirectQrcodeToPaymentPageData extends HttpDataType
 
     public function httpConfig(CollectHttpData $collectData)
     {
-        $url = $this->config->base_url . "/rwpay-element/process-qrcode/{$this->qrcode_slug}";
+        $url = $this->config->base_url . "/guhemba-element/process-qrcode/{$this->qrcode_slug}";
 
         $collectData->verb('redirect')
             ->endpoint($url)
