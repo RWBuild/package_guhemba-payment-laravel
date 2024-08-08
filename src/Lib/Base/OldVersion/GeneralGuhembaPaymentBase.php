@@ -36,7 +36,7 @@ class GeneralGuhembaPaymentBase
     /**
      * Url where user will be redirected when click on pay button
      */
-    public static $redirectGuhembaUrl = 'guhemba-element/process-qrcode';
+    public static $redirectGuhembaUrl = 'rwpay-element/process-qrcode';
 
     public static $transactionStatusUrl = 'third-party/transaction/check-status/from-payment-reference';
 
